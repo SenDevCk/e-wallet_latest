@@ -451,13 +451,12 @@ public class SplashActivity extends AppCompatActivity {
             Log.e("error", " in DownloadCheckMaster");
         }
     }
-
-
     private boolean checkAndRequestPermissions() {
         int read_phone_state = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE);
         int read_sms = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_SMS);
         int receve_sms = ContextCompat.checkSelfPermission(this, Manifest.permission.RECEIVE_SMS);
         int write_ex_storage = ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        int read_ex_storage = ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
 
         List<String> listPermissionsNeeded = new ArrayList<>();
 
@@ -466,6 +465,9 @@ public class SplashActivity extends AppCompatActivity {
         }
         if (write_ex_storage != PackageManager.PERMISSION_GRANTED) {
             listPermissionsNeeded.add(Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        }
+        if (read_ex_storage != PackageManager.PERMISSION_GRANTED) {
+            listPermissionsNeeded.add(Manifest.permission.READ_EXTERNAL_STORAGE);
         }
         if (read_sms != PackageManager.PERMISSION_GRANTED) {
             listPermissionsNeeded.add(Manifest.permission.READ_SMS);

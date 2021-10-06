@@ -1,5 +1,4 @@
 package com.bih.nic.e_wallet.utilitties;
-
 /**
  * Created by NIC2 on 16-11-2017.
  */

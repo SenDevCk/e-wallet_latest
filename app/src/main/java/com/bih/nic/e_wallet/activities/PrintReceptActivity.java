@@ -107,6 +107,7 @@ public class PrintReceptActivity extends AppCompatActivity implements ReceiveLis
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         ll1 = (LinearLayout) findViewById(R.id.ll1);
         ll2 = (LinearLayout) findViewById(R.id.ll2);
+        mContext=this;
   /*      if (CommonPref.getPrinterType(PrintReceptActivity.this).equalsIgnoreCase("T")) {
             session = new SharedPrefClass(PrintReceptActivity.this);
             btAdapt = BluetoothAdapter.getDefaultAdapter();
@@ -225,10 +226,10 @@ public class PrintReceptActivity extends AppCompatActivity implements ReceiveLis
             }
 
 
-    /*    if (!printData()) {
+        if (!printData()) {
             finalizeObject();
             return false;
-        }*/
+        }
 
         return true;
     }
@@ -240,9 +241,7 @@ public class PrintReceptActivity extends AppCompatActivity implements ReceiveLis
             ShowMsg.showException(e, "Printer", mContext);
             return false;
         }
-
         mPrinter.setReceiveEventListener(this);
-
         return true;
     }
 
@@ -1113,15 +1112,15 @@ public class PrintReceptActivity extends AppCompatActivity implements ReceiveLis
 
     @Override
     public void onClick(View v) {
-        if (isReadStorageAllowed()) {
+      //  if (isReadStorageAllowed()) {
             //If permission is already having then showing the toast
             bluetooth();
             return;
-        } else {
+       // } else {
 
             //If the app has not the permission then asking for the permission
-            requestBluetoothPermission();
-        }
+        //    requestBluetoothPermission();
+    //    }
     }
 
     //We are calling this method to check the permission status
@@ -1227,7 +1226,7 @@ public class PrintReceptActivity extends AppCompatActivity implements ReceiveLis
             } else {
                 if (printid == 1) {
                     printid1 = 1;
-                    if (Build.VERSION.SDK_INT < 23) {
+              /*      if (Build.VERSION.SDK_INT < 23) {
                         //Do not need to check the permission
                         Intent intent = new Intent(PrintReceptActivity.this, ConfigurePrinterActivity.class);
                         startActivity(intent);
@@ -1236,7 +1235,10 @@ public class PrintReceptActivity extends AppCompatActivity implements ReceiveLis
                             Intent intent = new Intent(PrintReceptActivity.this, ConfigurePrinterActivity.class);
                             startActivity(intent);
                         }
-                    }
+                    }*/
+
+                    Intent intent = new Intent(PrintReceptActivity.this, ConfigurePrinterActivity.class);
+                    startActivity(intent);
 
                 } else if (printid == 2) {
                     printid1 = 2;

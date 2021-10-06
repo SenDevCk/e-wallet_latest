@@ -303,6 +303,9 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
 
     private boolean checkAndRequestPermissions() {
+        int storage = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE);
+        int storage2 = ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        int bluetooth = ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH);
         int read_sms = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_SMS);
         int receve_sms = ContextCompat.checkSelfPermission(this, Manifest.permission.RECEIVE_SMS);
 
@@ -310,6 +313,15 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
         if (read_sms != PackageManager.PERMISSION_GRANTED) {
             listPermissionsNeeded.add(Manifest.permission.READ_SMS);
+        }
+        if (storage != PackageManager.PERMISSION_GRANTED) {
+            listPermissionsNeeded.add(Manifest.permission.READ_EXTERNAL_STORAGE);
+        }
+        if (storage2 != PackageManager.PERMISSION_GRANTED) {
+            listPermissionsNeeded.add(Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        }
+        if (bluetooth != PackageManager.PERMISSION_GRANTED) {
+            listPermissionsNeeded.add(Manifest.permission.BLUETOOTH);
         }
         if (receve_sms != PackageManager.PERMISSION_GRANTED) {
             listPermissionsNeeded.add(Manifest.permission.RECEIVE_SMS);

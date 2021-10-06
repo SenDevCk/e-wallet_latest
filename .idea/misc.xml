@@ -3,6 +3,10 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/Users/mdhus/AndroidStudioProjects/e-wallet_1/app/src/main/res/layout/activity_configure_printer.xml" value="0.1" />
+        <entry key="..\:/Users/mdhus/AndroidStudioProjects/e-wallet_1/app/src/main/res/layout/activity_main.xml" value="0.1" />
+        <entry key="..\:/Users/mdhus/AndroidStudioProjects/e-wallet_1/app/src/main/res/layout/activity_print_recept.xml" value="0.14114583333333333" />
+        <entry key="..\:/Users/mdhus/AndroidStudioProjects/e-wallet_1/app/src/main/res/layout/main.xml" value="0.11041666666666666" />
         <entry key="..\:/chandan backup/EWallet/app/src/main/res/drawable/circuler_gray.xml" value="0.7520833333333333" />
         <entry key="..\:/chandan backup/EWallet/app/src/main/res/layout/activity_configure_printer.xml" value="0.33" />
         <entry key="..\:/chandan backup/EWallet/app/src/main/res/layout/activity_login.xml" value="0.1875" />
@@ -10,5 +14,5 @@
       </map>
     </option>
   </component>
-  <component name="ProjectRootManager" version="2" languageLevel="JDK_1_8" default="true" project-jdk-name="1.8" project-jdk-type="JavaSDK" />
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_11" project-jdk-name="1.8" project-jdk-type="JavaSDK" />
 </project>

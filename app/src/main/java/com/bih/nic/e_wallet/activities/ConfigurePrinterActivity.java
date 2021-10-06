@@ -27,10 +27,6 @@ import com.epson.epos2.discovery.FilterOption;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-
-
-
-
 public class ConfigurePrinterActivity extends AppCompatActivity implements View.OnClickListener,AdapterView.OnItemClickListener {
    // private ActionBar actionBar;
     private Context mContext = null;
@@ -95,28 +91,20 @@ public class ConfigurePrinterActivity extends AppCompatActivity implements View.
 
     @Override
     public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.btnRestart:
-                restartDiscovery();
-                break;
-
-            default:
-                // Do nothing
-                break;
+        // Do nothing
+        if (v.getId() == R.id.btnRestart) {
+        //    Toast.makeText(getApplicationContext(), "restart button clicked", Toast.LENGTH_SHORT).show();
+            restartDiscovery();
         }
     }
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        Intent intent = new Intent();
         HashMap<String, String> item  = mPrinterList.get(position);
-        /*intent.putExtra(getString(R.string.title_target), item.get("Target"));
-        setResult(RESULT_OK, intent);*/
         CommonPref.setPrinterMacAddress(getApplicationContext(),item.get("Target"));
         Toast.makeText(getApplicationContext(), item.get("Target"), Toast.LENGTH_LONG).show();
         finish();
     }
-
     private void restartDiscovery() {
         while (true) {
             try {
@@ -130,10 +118,8 @@ public class ConfigurePrinterActivity extends AppCompatActivity implements View.
                 }
             }
         }
-
         mPrinterList.clear();
         mPrinterListAdapter.notifyDataSetChanged();
-
         try {
             Discovery.start(this, mFilterOption, mDiscoveryListener);
         }
@@ -142,7 +128,7 @@ public class ConfigurePrinterActivity extends AppCompatActivity implements View.
         }
     }
 
-    private DiscoveryListener mDiscoveryListener = new DiscoveryListener() {
+    private final DiscoveryListener mDiscoveryListener = new DiscoveryListener() {
         @Override
         public void onDiscovery(final DeviceInfo deviceInfo) {
             runOnUiThread(new Runnable() {
