@@ -68,17 +68,17 @@ public class StatementAdapter extends BaseAdapter {
         } else {*/
             ViewHolder viewHolder=new ViewHolder();
             convertView = layoutInflater.inflate(R.layout.statement_item2, null, false);
-            viewHolder.ll_st_head=(LinearLayout) convertView.findViewById(R.id.ll_st_head);
-            viewHolder.text_recept_no=(TextView) convertView.findViewById(R.id.text_recept_no);
-            viewHolder.text_amount=(TextView) convertView.findViewById(R.id.text_amount);
-            viewHolder.text_message_string=(TextView) convertView.findViewById(R.id.text_message_string);
-            viewHolder.text_date=(TextView) convertView.findViewById(R.id.text_date);
+            viewHolder.ll_st_head= convertView.findViewById(R.id.ll_st_head);
+            viewHolder.text_recept_no= convertView.findViewById(R.id.text_recept_no);
+            viewHolder.text_amount= convertView.findViewById(R.id.text_amount);
+            viewHolder.text_message_string= convertView.findViewById(R.id.text_message_string);
+            viewHolder.text_date= convertView.findViewById(R.id.text_date);
             viewHolder.text_recept_no.setText("Recept No : "+statementMS.get(position).getRCPT_NO());
             viewHolder.text_amount.setText("Rs. "+ statementMS.get(position).getPAY_AMT());
             if (!statementMS.get(position).getMESSAGE_STRING().equalsIgnoreCase("success"))
                 viewHolder.text_message_string.setTextColor(activity.getResources().getColor(R.color.colorAccent));
             viewHolder.text_message_string.setText("Con ID : "+statementMS.get(position).getCON_ID());
-            viewHolder.text_view=(TextView) convertView.findViewById(R.id.text_view);
+            viewHolder.text_view= convertView.findViewById(R.id.text_view);
            /* viewHolder.text_view.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -88,13 +88,10 @@ public class StatementAdapter extends BaseAdapter {
                 }
             });*/
             viewHolder.text_view.setText(""+statementMS.get(position).getCNAME());
-            viewHolder.ll_st_head.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Intent intent=new Intent(activity,PrintReceptActivity.class);
-                    intent.putExtra("object", statementMS.get(position));
-                    activity.startActivity(intent);
-                }
+            viewHolder.ll_st_head.setOnClickListener(v -> {
+                Intent intent=new Intent(activity,PrintReceptActivity.class);
+                intent.putExtra("object", statementMS.get(position));
+                activity.startActivity(intent);
             });
             String[] tokens= Utiilties.convertTimestampToStringSlash(statementMS.get(position).getPayDate()).split(" ");
             /*if (position==0){

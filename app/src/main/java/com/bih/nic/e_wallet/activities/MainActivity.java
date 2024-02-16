@@ -11,6 +11,7 @@ import android.bluetooth.BluetoothDevice;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -47,6 +48,7 @@ import com.bih.nic.e_wallet.Tvsprinter.Activity_DeviceList;
 import com.bih.nic.e_wallet.Tvsprinter.SharedPrefClass;
 import com.bih.nic.e_wallet.asynkTask.BalanceLoader;
 import com.bih.nic.e_wallet.asynkTask.GetNEFTService;
+import com.bih.nic.e_wallet.asynkTask.LoginLoader;
 import com.bih.nic.e_wallet.asynkTask.MRUAlocatar;
 import com.bih.nic.e_wallet.asynkTask.ReportLoader;
 import com.bih.nic.e_wallet.asynkTask.SyncroniseStatement;
@@ -57,20 +59,27 @@ import com.bih.nic.e_wallet.entity.MRUEntity;
 import com.bih.nic.e_wallet.entity.NeftEntity;
 import com.bih.nic.e_wallet.entity.UserInfo2;
 import com.bih.nic.e_wallet.interfaces.BalanceListner;
+import com.bih.nic.e_wallet.retrofit.APIClient;
+import com.bih.nic.e_wallet.retrofit.APIInterface;
 import com.bih.nic.e_wallet.utilitties.CommonPref;
 import com.bih.nic.e_wallet.utilitties.Urls_this_pro;
 import com.bih.nic.e_wallet.utilitties.Utiilties;
 import com.bih.nic.e_wallet.utilitties.WebHandler;
 import com.bih.nic.e_wallet.webservices.WebServiceHelper;
 import com.google.android.material.navigation.NavigationView;
+
+import org.json.JSONObject;
+
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
-
 import HPRTAndroidSDK.HPRTPrinterHelper;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener, NavigationView.OnNavigationItemSelectedListener {
     Toolbar toolbar_sel_main;
@@ -101,6 +110,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private ProgressDialog pd;
     private Message message;
     private Thread thread;
+
+    String key = "_USER_DETAILS";
+
+    private APIInterface apiInterface;
+
+    ProgressDialog progressDialog;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -112,47 +128,43 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawer, toolbar_sel_main, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.setDrawerListener(toggle);
         toggle.syncState();
-        session=new SharedPrefClass(MainActivity.this);
-        btAdapt=BluetoothAdapter.getDefaultAdapter();
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        session = new SharedPrefClass(MainActivity.this);
+        btAdapt = BluetoothAdapter.getDefaultAdapter();
+        NavigationView navigationView =  findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
         //navigation header
         try {
             String version = getPackageManager().getPackageInfo(getPackageName(), 0).versionName;
             String code_v = String.valueOf(getPackageManager().getPackageInfo(getPackageName(), 0).versionCode);
-            TextView app_name_tip = (TextView) navigationView.findViewById(R.id.app_name_tip);
+            TextView app_name_tip =  navigationView.findViewById(R.id.app_name_tip);
             app_name_tip.setText("E-Wallet ( " + code_v + "." + version + " ) V");
         } catch (PackageManager.NameNotFoundException e) {
             e.printStackTrace();
         }
         View header = navigationView.getHeaderView(0);
-        text_header_name = (TextView) header.findViewById(R.id.text_header_name);
-        text_header_mobile = (TextView) header.findViewById(R.id.text_header_mobile);
-        imageViewheader = (ImageView) header.findViewById(R.id.imageViewheader);
-
+        text_header_name =  header.findViewById(R.id.text_header_name);
+        text_header_mobile =  header.findViewById(R.id.text_header_mobile);
+        imageViewheader =  header.findViewById(R.id.imageViewheader);
         //imageViewheader.setOnClickListener(this);
-        header_image = (ImageView) findViewById(R.id.header_image);
+        header_image =  findViewById(R.id.header_image);
         UserInfo2 userinfo = CommonPref.getUserDetails(MainActivity.this);
+        text_header_name.setText(""+userinfo.getUserName());
+        text_header_mobile.setText(""+userinfo.getContactNo());
         if (userinfo.getUserID().startsWith("2")) {
             header_image.setImageDrawable(getResources().getDrawable(R.drawable.sblogo1));
             imageViewheader.setImageDrawable(getResources().getDrawable(R.drawable.sblogo1));
         } else if (userinfo.getUserID().startsWith("1")) {
             header_image.setImageDrawable(getResources().getDrawable(R.drawable.nblogo));
             imageViewheader.setImageDrawable(getResources().getDrawable(R.drawable.nblogo));
-
         }
-        text_header_name.setText("" + userinfo.getUserName());
-        text_header_mobile.setText("" + userinfo.getContactNo());
-
-        text_pen = (TextView) findViewById(R.id.text_pen);
+        text_pen =  findViewById(R.id.text_pen);
         text_pen.setVisibility(View.GONE);
-
-        ll_topup = (LinearLayout) findViewById(R.id.ll_topup);
-        ll_setup = (LinearLayout) findViewById(R.id.ll_setup);
-        ll_consumer_list = (LinearLayout) findViewById(R.id.ll_consumer_list);
-        ll_payment = (LinearLayout) findViewById(R.id.ll_payment);
-        ll_syncall = (LinearLayout) findViewById(R.id.ll_syncall);
-        ll_statement = (LinearLayout) findViewById(R.id.ll_statement);
+        ll_topup =  findViewById(R.id.ll_topup);
+        ll_setup =  findViewById(R.id.ll_setup);
+        ll_consumer_list =  findViewById(R.id.ll_consumer_list);
+        ll_payment =  findViewById(R.id.ll_payment);
+        ll_syncall =  findViewById(R.id.ll_syncall);
+        ll_statement =  findViewById(R.id.ll_statement);
         ll_topup.setOnClickListener(this);
         ll_setup.setOnClickListener(this);
         ll_consumer_list.setOnClickListener(this);
@@ -162,8 +174,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         rotation = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.rotation);
         footerinit();
         UserInfo2 userInfo2 = CommonPref.getUserDetails(MainActivity.this);
-        if (CommonPref.getCurrentDateForSync(MainActivity.this).equals("")){
-            CommonPref.setCurrentDateForSync(MainActivity.this,Utiilties.getCurrentDateWithTime());
+        if (CommonPref.getCurrentDateForSync(MainActivity.this).equals("")) {
+            CommonPref.setCurrentDateForSync(MainActivity.this, Utiilties.getCurrentDateWithTime());
         }
         if (Utiilties.isOnline(MainActivity.this) && Utiilties.getCountOfDays(Utiilties.getCurrentDateWithTime(), CommonPref.getCurrentDateForSync(MainActivity.this)) >= 1) {
             syncroniseStatementForMain = (SyncroniseStatementForMain) new SyncroniseStatementForMain(MainActivity.this).execute(userInfo2.getUserID() + "|" + userInfo2.getPassword() + "|" + userInfo2.getImeiNo() + "|" + userInfo2.getSerialNo() + "|1");
@@ -191,24 +203,20 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private void footerinit() {
         //setPendingTransWeakup();
         footer = findViewById(R.id.footer);
-        rel_profile = (LinearLayout) footer.findViewById(R.id.rel_profile);
-        change_mpin = (LinearLayout) footer.findViewById(R.id.change_mpin);
-        share = (LinearLayout) footer.findViewById(R.id.refresh);
-        zxing_barcode_scanner2 = (LinearLayout) footer.findViewById(R.id.zxing_barcode_scanner2);
-        img_rotate = (ImageView) footer.findViewById(R.id.img_rotate);
+        rel_profile =  footer.findViewById(R.id.rel_profile);
+        change_mpin =  footer.findViewById(R.id.change_mpin);
+        share =  footer.findViewById(R.id.refresh);
+        zxing_barcode_scanner2 =  footer.findViewById(R.id.zxing_barcode_scanner2);
+        img_rotate =  footer.findViewById(R.id.img_rotate);
         rel_profile.setOnClickListener(this);
         change_mpin.setOnClickListener(this);
         zxing_barcode_scanner2.setOnClickListener(this);
         share.setOnClickListener(this);
         //qrScan = new IntentIntegrator(this);
 
-
-        text_bav_bal = (TextView) findViewById(R.id.text_bav_bal);
+        text_bav_bal =  findViewById(R.id.text_bav_bal);
         text_bav_bal.setText(CommonPref.getUserDetails(MainActivity.this).getWalletAmount());
-
-
     }
-
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         int id = item.getItemId();
@@ -236,9 +244,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         } else if (id == R.id.drawer_list_un) {
             startActivity(new Intent(MainActivity.this, UnbilledConsumerListActivity.class));
 
-        }else if(id == R.id.drawer_web_report){
+        } else if (id == R.id.drawer_web_report) {
             UserInfo2 userInfo2 = CommonPref.getUserDetails(MainActivity.this);
-            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("http://energybills.bsphcl.co.in/WebApplication1/newjsp.jsp?walletId="+userInfo2.getWalletId().trim())));
+            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("http://energybills.bsphcl.co.in/WebApplication1/newjsp.jsp?walletId=" + userInfo2.getWalletId().trim())));
             //startActivity(new Intent(MainActivity.this,WebReportActivity.class));
         } else {
             Toast.makeText(this, "Under Process..", Toast.LENGTH_SHORT).show();
@@ -286,40 +294,84 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         balance_loader.cancel(true);
                     }
                     img_rotate.startAnimation(rotation);
-                    BalanceLoader.bindmListener(new BalanceListner() {
-                        @Override
-                        public void balanceReceived(final double balance) {
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public synchronized void run() {
-                                    text_bav_bal.setText(String.valueOf(balance).trim());
-                                    img_rotate.clearAnimation();
-                       }
-                            });
-                        }
-                    });
-                    balance_loader = (BalanceLoader) (new BalanceLoader(MainActivity.this).execute(userInfo2.getUserID() + "|" + userInfo2.getPassword() + "|" + userInfo2.getImeiNo() + "|" + userInfo2.getSerialNo()));
+//                    BalanceLoader.bindmListener(balance -> runOnUiThread(new Runnable() {
+//                        @Override
+//                        public synchronized void run() {
+//                            text_bav_bal.setText(String.valueOf(balance).trim());
+//                            img_rotate.clearAnimation();
+//                        }
+//                    }));
+                    //balance_loader = (BalanceLoader) (new BalanceLoader(MainActivity.this).execute(userInfo2.getUserID() + "|" + userInfo2.getPassword() + "|" + userInfo2.getImeiNo() + "|" + userInfo2.getSerialNo()));
+                    loadBalance(reqString(userInfo2.getUserID() + "|" + userInfo2.getPassword() + "|" + userInfo2.getImeiNo() + "|" + userInfo2.getSerialNo()));
                 }
             }
         }
     }
+
+    private void loadBalance(String reqString) {
+        apiInterface = APIClient.getClient(com.bih.nic.e_wallet.retrofit.Urls_this_pro.RETROFIT_BASE_URL).create(APIInterface.class);
+        Call<String> call1 = apiInterface.loadBalance(reqString);
+        progressDialog = new ProgressDialog(MainActivity.this);
+        progressDialog.setMessage("Fetching...");
+        progressDialog.setCancelable(false);
+        progressDialog.show();
+        call1.enqueue(new Callback<String>() {
+            @Override
+            public void onResponse(Call<String> call, Response<String> response) {
+                if (progressDialog.isShowing()) progressDialog.dismiss();
+                String result = null;
+                if (response.body() != null) result = response.body();
+                if (result != null) {
+                    try {
+                        JSONObject jsonObject = new JSONObject(result);
+                        if(jsonObject.has("accountBalance")) {
+                            SharedPreferences prefs = getSharedPreferences(key,
+                                    Context.MODE_PRIVATE);
+                            SharedPreferences.Editor editor = prefs.edit();
+                            editor.putString("WalletAmount", jsonObject.getString("accountBalance"));
+                            editor.commit();
+                            //balanceListner.balanceReceived(Double.parseDouble(jsonObject.getString("accountBalance")));
+                            text_bav_bal.setText(jsonObject.getString("accountBalance"));
+                            img_rotate.clearAnimation();
+                        }else{
+                            Toast.makeText(MainActivity.this, ""+result, Toast.LENGTH_SHORT).show();
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        Toast.makeText(MainActivity.this, ""+e.getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                }else{
+                    Toast.makeText(MainActivity.this, "Server Problem", Toast.LENGTH_SHORT).show();
+                }
+
+            }
+
+            @Override
+            public void onFailure(Call<String> call, Throwable t) {
+                Log.e("error", t.getMessage());
+                Toast.makeText(MainActivity.this, "" + t.getMessage(), Toast.LENGTH_SHORT).show();
+                if (progressDialog.isShowing()) progressDialog.dismiss();
+                call.cancel();
+            }
+        });
+    }
+
+
+
 
     private void getImageDialog() {
         String[] days_list = {"1 day", "7 days", "30 days", "90 days", "180 days"};
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Sync Option");
-        builder.setItems(days_list, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                // the user clicked on colors[which]
-                String no_of_day = days_list[which].trim().split(" ")[0];
-                UserInfo2 userInfo2 = CommonPref.getUserDetails(MainActivity.this);
-                if (Utiilties.isOnline(MainActivity.this) && userInfo2 != null) {
-                    syncroniseStatement = (SyncroniseStatement) new SyncroniseStatement(MainActivity.this).execute(userInfo2.getUserID() + "|" + userInfo2.getPassword() + "|" + userInfo2.getImeiNo() + "|" + userInfo2.getSerialNo() + "|" + no_of_day);
-                } else {
-                    startActivity(new Intent(MainActivity.this, StatmentSyncronizeActivity.class));
-                }
+        builder.setItems(days_list, (dialog, which) -> {
+            // the user clicked on colors[which]
+            String no_of_day = days_list[which].trim().split(" ")[0];
+            UserInfo2 userInfo2 = CommonPref.getUserDetails(MainActivity.this);
+            if (Utiilties.isOnline(MainActivity.this) && userInfo2 != null) {
+                syncroniseStatement = (SyncroniseStatement) new SyncroniseStatement(MainActivity.this).execute(userInfo2.getUserID() + "|" + userInfo2.getPassword() + "|" + userInfo2.getImeiNo() + "|" + userInfo2.getSerialNo() + "|" + no_of_day);
+            } else {
+                startActivity(new Intent(MainActivity.this, StatmentSyncronizeActivity.class));
             }
         });
         builder.show();
@@ -329,31 +381,25 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setMessage("Would you like to topup ?")
                 .setCancelable(false)
-                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        if (!Utiilties.isOnline(MainActivity.this)) {
-                            Toast.makeText(MainActivity.this, "Please go online !", Toast.LENGTH_SHORT).show();
-                        } else {
-                            Intent browserIntent = null;
-                            UserInfo2 userinfo = CommonPref.getUserDetails(MainActivity.this);
-                            if (userinfo.getUserID().startsWith("2")) {
-                                //webView.loadUrl("https://bihars.b2biz.co.in/BiharDiscom");
-                                browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://bihars.b2biz.co.in/BiharDiscom/"));
-                                //webView.loadUrl("https://test.b2biz.co.in/BiharDiscom");
-                            } else if (userinfo.getUserID().startsWith("1")) {
-                                //webView.loadUrl("https://biharn.b2biz.co.in/BiharDiscom");
-                                browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://biharn.b2biz.co.in/NorthBiharDiscom/"));
-                            }
-                            //browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://test.b2biz.co.in/BiharDiscom"));
-                            startActivity(browserIntent);
+                .setPositiveButton("Yes", (dialog, id) -> {
+                    if (!Utiilties.isOnline(MainActivity.this)) {
+                        Toast.makeText(MainActivity.this, "Please go online !", Toast.LENGTH_SHORT).show();
+                    } else {
+                        Intent browserIntent = null;
+                        UserInfo2 userinfo = CommonPref.getUserDetails(MainActivity.this);
+                        if (userinfo.getUserID().startsWith("2")) {
+                            //webView.loadUrl("https://bihars.b2biz.co.in/BiharDiscom");
+                            browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://bihars.b2biz.co.in/BiharDiscom/"));
+                            //webView.loadUrl("https://test.b2biz.co.in/BiharDiscom");
+                        } else if (userinfo.getUserID().startsWith("1")) {
+                            //webView.loadUrl("https://biharn.b2biz.co.in/BiharDiscom");
+                            browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://biharn.b2biz.co.in/NorthBiharDiscom/"));
                         }
+                        //browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://test.b2biz.co.in/BiharDiscom"));
+                        startActivity(browserIntent);
                     }
                 })
-                .setNegativeButton("No", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        dialog.cancel();
-                    }
-                });
+                .setNegativeButton("No", (dialog, id) -> dialog.cancel());
         AlertDialog alert = builder.create();
         alert.setTitle("Topup Dialog");
         alert.show();
@@ -367,71 +413,55 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         setup_dialog.setTitle("");
         setup_dialog.setCancelable(false);
         // set values for custom dialog components - text, image and button
-        text_fromdate = (TextView) setup_dialog.findViewById(R.id.text_fromdate);
-        text_todate = (TextView) setup_dialog.findViewById(R.id.text_todate);
-        text_fromdate.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                date_clik = "F";
-                new DatePickerDialog(MainActivity.this, date, myCalendar
-                        .get(Calendar.YEAR), myCalendar.get(Calendar.MONTH),
-                        myCalendar.get(Calendar.DAY_OF_MONTH)).show();
-            }
+        text_fromdate =  setup_dialog.findViewById(R.id.text_fromdate);
+        text_todate =  setup_dialog.findViewById(R.id.text_todate);
+        text_fromdate.setOnClickListener(view -> {
+            date_clik = "F";
+            new DatePickerDialog(MainActivity.this, date, myCalendar
+                    .get(Calendar.YEAR), myCalendar.get(Calendar.MONTH),
+                    myCalendar.get(Calendar.DAY_OF_MONTH)).show();
         });
-        text_todate.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                date_clik = "T";
-                new DatePickerDialog(MainActivity.this, date, myCalendar
-                        .get(Calendar.YEAR), myCalendar.get(Calendar.MONTH),
-                        myCalendar.get(Calendar.DAY_OF_MONTH)).show();
-            }
+        text_todate.setOnClickListener(view -> {
+            date_clik = "T";
+            new DatePickerDialog(MainActivity.this, date, myCalendar
+                    .get(Calendar.YEAR), myCalendar.get(Calendar.MONTH),
+                    myCalendar.get(Calendar.DAY_OF_MONTH)).show();
         });
-        ImageView close_setup = (ImageView) setup_dialog.findViewById(R.id.img_close);
-        close_setup.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                setup_dialog.dismiss();
-            }
-        });
-        Button search_for_mru = (Button) setup_dialog.findViewById(R.id.search_for_mru);
-        search_for_mru.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // Close dialog
-
-                SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
-                if (text_fromdate.getText().toString().trim().equals("--Select From Date--")) {
-                    Toast.makeText(MainActivity.this, "Select From Date", Toast.LENGTH_SHORT).show();
-                } else if (text_todate.getText().toString().trim().equals("--Select To Date--")) {
-                    Toast.makeText(MainActivity.this, "Select To Date", Toast.LENGTH_SHORT).show();
-                } else {
-                    try {
-                        int com = formatter.parse(text_todate.getText().toString().trim()).compareTo(formatter.parse(text_fromdate.getText().toString().trim()));
-                        if (com <= 0) {
-                            Toast.makeText(MainActivity.this, "Selected-To-Date is not correct", Toast.LENGTH_SHORT).show();
-                        } else if (Utiilties.monthsBetweenDates(formatter.parse(text_fromdate.getText().toString().trim()), formatter.parse(text_todate.getText().toString().trim())) > 3) {
-                            Toast.makeText(MainActivity.this, "Date difference must be 3 months !", Toast.LENGTH_SHORT).show();
-                        } else if (!Utiilties.isOnline(MainActivity.this)) {
-                            ArrayList<NeftEntity> neftEntities = new DataBaseHelper(MainActivity.this).getTotalNeft(text_fromdate.getText().toString().trim(), text_todate.getText().toString().trim(), CommonPref.getUserDetails(MainActivity.this).getUserID());
-                            if (neftEntities.size() > 0) {
-                                CommonPref.neftEntities = neftEntities;
-                                startActivity(new Intent(MainActivity.this, GetNeftPayActivity.class));
-                            } else {
-                                Toast.makeText(MainActivity.this, "NO DATA FOUND !", Toast.LENGTH_SHORT).show();
-                            }
+        ImageView close_setup =  setup_dialog.findViewById(R.id.img_close);
+        close_setup.setOnClickListener(v -> setup_dialog.dismiss());
+        Button search_for_mru =  setup_dialog.findViewById(R.id.search_for_mru);
+        search_for_mru.setOnClickListener(v -> {
+            // Close dialog
+            SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
+            if (text_fromdate.getText().toString().trim().equals("--Select From Date--")) {
+                Toast.makeText(MainActivity.this, "Select From Date", Toast.LENGTH_SHORT).show();
+            } else if (text_todate.getText().toString().trim().equals("--Select To Date--")) {
+                Toast.makeText(MainActivity.this, "Select To Date", Toast.LENGTH_SHORT).show();
+            } else {
+                try {
+                    int com = formatter.parse(text_todate.getText().toString().trim()).compareTo(formatter.parse(text_fromdate.getText().toString().trim()));
+                    if (com <= 0) {
+                        Toast.makeText(MainActivity.this, "Selected-To-Date is not correct", Toast.LENGTH_SHORT).show();
+                    } else if (Utiilties.monthsBetweenDates(formatter.parse(text_fromdate.getText().toString().trim()), formatter.parse(text_todate.getText().toString().trim())) > 3) {
+                        Toast.makeText(MainActivity.this, "Date difference must be 3 months !", Toast.LENGTH_SHORT).show();
+                    } else if (!Utiilties.isOnline(MainActivity.this)) {
+                        ArrayList<NeftEntity> neftEntities = new DataBaseHelper(MainActivity.this).getTotalNeft(text_fromdate.getText().toString().trim(), text_todate.getText().toString().trim(), CommonPref.getUserDetails(MainActivity.this).getUserID());
+                        if (neftEntities.size() > 0) {
+                            CommonPref.neftEntities = neftEntities;
+                            startActivity(new Intent(MainActivity.this, GetNeftPayActivity.class));
                         } else {
-                            setup_dialog.dismiss();
-                            UserInfo2 userInfo2 = CommonPref.getUserDetails(MainActivity.this);
-                            getNEFTService = (GetNEFTService) new GetNEFTService(MainActivity.this, text_fromdate.getText().toString().trim(), text_todate.getText().toString().trim(), userInfo2.getUserID()).execute(userInfo2.getUserID() + "|" + userInfo2.getPassword() + "|" + userInfo2.getImeiNo() + "|" + userInfo2.getSerialNo() + "|" + text_fromdate.getText().toString().trim() + "|" + text_todate.getText().toString().trim());
-
+                            Toast.makeText(MainActivity.this, "NO DATA FOUND !", Toast.LENGTH_SHORT).show();
                         }
-                    } catch (Exception e) {
-                        e.printStackTrace();
+                    } else {
+                        setup_dialog.dismiss();
+                        UserInfo2 userInfo2 = CommonPref.getUserDetails(MainActivity.this);
+                        getNEFTService = (GetNEFTService) new GetNEFTService(MainActivity.this, text_fromdate.getText().toString().trim(), text_todate.getText().toString().trim(), userInfo2.getUserID()).execute(userInfo2.getUserID() + "|" + userInfo2.getPassword() + "|" + userInfo2.getImeiNo() + "|" + userInfo2.getSerialNo() + "|" + text_fromdate.getText().toString().trim() + "|" + text_todate.getText().toString().trim());
+
                     }
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
             }
-
         });
         setup_dialog.show();
     }
@@ -445,88 +475,66 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         setup_dialog.setTitle("");
         setup_dialog.setCancelable(false);
         // set values for custom dialog components - text, image and button
-        text_fromdate = (TextView) setup_dialog.findViewById(R.id.text_fromdate);
-        text_todate = (TextView) setup_dialog.findViewById(R.id.text_todate);
-        text_fromdate.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                date_clik = "F";
-                new DatePickerDialog(MainActivity.this, date, myCalendar
-                        .get(Calendar.YEAR), myCalendar.get(Calendar.MONTH),
-                        myCalendar.get(Calendar.DAY_OF_MONTH)).show();
-            }
+        text_fromdate =  setup_dialog.findViewById(R.id.text_fromdate);
+        text_todate =  setup_dialog.findViewById(R.id.text_todate);
+        text_fromdate.setOnClickListener(view -> {
+            date_clik = "F";
+            new DatePickerDialog(MainActivity.this, date, myCalendar
+                    .get(Calendar.YEAR), myCalendar.get(Calendar.MONTH),
+                    myCalendar.get(Calendar.DAY_OF_MONTH)).show();
         });
-        text_todate.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                date_clik = "T";
-                new DatePickerDialog(MainActivity.this, date, myCalendar
-                        .get(Calendar.YEAR), myCalendar.get(Calendar.MONTH),
-                        myCalendar.get(Calendar.DAY_OF_MONTH)).show();
-            }
+        text_todate.setOnClickListener(view -> {
+            date_clik = "T";
+            new DatePickerDialog(MainActivity.this, date, myCalendar
+                    .get(Calendar.YEAR), myCalendar.get(Calendar.MONTH),
+                    myCalendar.get(Calendar.DAY_OF_MONTH)).show();
         });
-        ImageView close_setup = (ImageView) setup_dialog.findViewById(R.id.img_close);
-        close_setup.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                setup_dialog.dismiss();
-            }
-        });
-        Button search_for_mru = (Button) setup_dialog.findViewById(R.id.search_for_mru);
-        search_for_mru.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // Close dialog
+        ImageView close_setup =  setup_dialog.findViewById(R.id.img_close);
+        close_setup.setOnClickListener(v -> setup_dialog.dismiss());
+        Button search_for_mru =  setup_dialog.findViewById(R.id.search_for_mru);
+        search_for_mru.setOnClickListener(v -> {
+            // Close dialog
+            SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
+            if (text_fromdate.getText().toString().trim().equals("--Select From Date--")) {
+                Toast.makeText(MainActivity.this, "Select From Date", Toast.LENGTH_SHORT).show();
+            } else if (text_todate.getText().toString().trim().equals("--Select To Date--")) {
+                Toast.makeText(MainActivity.this, "Select To Date", Toast.LENGTH_SHORT).show();
+            } else {
+                try {
+                    int com = formatter.parse(text_todate.getText().toString().trim()).compareTo(formatter.parse(text_fromdate.getText().toString().trim()));
+                    if (com <= 0) {
+                        Toast.makeText(MainActivity.this, "Selected-To-Date is not correct", Toast.LENGTH_SHORT).show();
+                    } else if (Utiilties.monthsBetweenDates(formatter.parse(text_fromdate.getText().toString().trim()), formatter.parse(text_todate.getText().toString().trim())) > 3) {
+                        Toast.makeText(MainActivity.this, "Date difference must be 3 months !", Toast.LENGTH_SHORT).show();
+                    } else {
 
-                SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
-                if (text_fromdate.getText().toString().trim().equals("--Select From Date--")) {
-                    Toast.makeText(MainActivity.this, "Select From Date", Toast.LENGTH_SHORT).show();
-                } else if (text_todate.getText().toString().trim().equals("--Select To Date--")) {
-                    Toast.makeText(MainActivity.this, "Select To Date", Toast.LENGTH_SHORT).show();
-                } else {
-                    try {
-                        int com = formatter.parse(text_todate.getText().toString().trim()).compareTo(formatter.parse(text_fromdate.getText().toString().trim()));
-                        if (com <= 0) {
-                            Toast.makeText(MainActivity.this, "Selected-To-Date is not correct", Toast.LENGTH_SHORT).show();
-                        } else if (Utiilties.monthsBetweenDates(formatter.parse(text_fromdate.getText().toString().trim()), formatter.parse(text_todate.getText().toString().trim())) > 3) {
-                            Toast.makeText(MainActivity.this, "Date difference must be 3 months !", Toast.LENGTH_SHORT).show();
+                        setup_dialog.dismiss();
+                        if (flag == 1) {
+                            Intent intent_report = new Intent(MainActivity.this, ReportActivity.class);
+                            intent_report.putExtra("from", text_fromdate.getText().toString().trim());
+                            intent_report.putExtra("to", text_todate.getText().toString().trim());
+                            startActivity(intent_report);
                         } else {
-
-                            setup_dialog.dismiss();
-                            if (flag == 1) {
-                                Intent intent_report = new Intent(MainActivity.this, ReportActivity.class);
-                                intent_report.putExtra("from", text_fromdate.getText().toString().trim());
-                                intent_report.putExtra("to", text_todate.getText().toString().trim());
-                                startActivity(intent_report);
-                            } else {
-                                UserInfo2 userInfo2 = CommonPref.getUserDetails(MainActivity.this);
-                                new ReportLoader(MainActivity.this).execute(userInfo2.getUserID() + "|" + userInfo2.getPassword() + "|" + userInfo2.getImeiNo() + "|" + userInfo2.getSerialNo() + "|" + text_fromdate.getText().toString().trim() + "|" + text_todate.getText().toString().trim());
-                            }
-
+                            UserInfo2 userInfo2 = CommonPref.getUserDetails(MainActivity.this);
+                            new ReportLoader(MainActivity.this).execute(userInfo2.getUserID() + "|" + userInfo2.getPassword() + "|" + userInfo2.getImeiNo() + "|" + userInfo2.getSerialNo() + "|" + text_fromdate.getText().toString().trim() + "|" + text_todate.getText().toString().trim());
                         }
-                    } catch (Exception e) {
-                        e.printStackTrace();
+
                     }
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
             }
-
         });
         setup_dialog.show();
     }
 
     Calendar myCalendar = Calendar.getInstance();
-    DatePickerDialog.OnDateSetListener date = new DatePickerDialog.OnDateSetListener() {
-
-        @Override
-        public void onDateSet(DatePicker view, int year, int monthOfYear,
-                              int dayOfMonth) {
-            // TODO Auto-generated method stub
-            myCalendar.set(Calendar.YEAR, year);
-            myCalendar.set(Calendar.MONTH, monthOfYear);
-            myCalendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
-            updateLabel();
-        }
-
+    DatePickerDialog.OnDateSetListener date = (view, year, monthOfYear, dayOfMonth) -> {
+        // TODO Auto-generated method stub
+        myCalendar.set(Calendar.YEAR, year);
+        myCalendar.set(Calendar.MONTH, monthOfYear);
+        myCalendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
+        updateLabel();
     };
 
     private void updateLabel() {
@@ -548,10 +556,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         setup_dialog.setTitle("");
         setup_dialog.setCancelable(false);
         // set values for custom dialog components - text, image and button
-        final EditText edit_con_id = (EditText) setup_dialog.findViewById(R.id.edit_con_id);
-        final EditText edit_acount_no = (EditText) setup_dialog.findViewById(R.id.edit_acount_no);
-        final EditText edit_book_no = (EditText) setup_dialog.findViewById(R.id.edit_book_no);
-
+        final EditText edit_con_id =  setup_dialog.findViewById(R.id.edit_con_id);
+        final EditText edit_acount_no =  setup_dialog.findViewById(R.id.edit_acount_no);
+        final EditText edit_book_no =  setup_dialog.findViewById(R.id.edit_book_no);
         edit_con_id.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -616,37 +623,27 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 }
             }
         });
-        ImageView close_setup = (ImageView) setup_dialog.findViewById(R.id.img_close);
-        close_setup.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+        ImageView close_setup =  setup_dialog.findViewById(R.id.img_close);
+        close_setup.setOnClickListener(v -> setup_dialog.dismiss());
+        Button search_for_mru =  setup_dialog.findViewById(R.id.search_for_mru);
+        search_for_mru.setOnClickListener(v -> {
+            // Close dialog
+            UserInfo2 userInfo2 = CommonPref.getUserDetails(MainActivity.this);
+            if (edit_con_id.getText().toString().trim().length() > 0) {
                 setup_dialog.dismiss();
-            }
-        });
-        Button search_for_mru = (Button) setup_dialog.findViewById(R.id.search_for_mru);
-        search_for_mru.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // Close dialog
-                UserInfo2 userInfo2 = CommonPref.getUserDetails(MainActivity.this);
-                if (edit_con_id.getText().toString().trim().length() > 0) {
-                    setup_dialog.dismiss();
-                    new MRULoader().execute(userInfo2.getUserID() + "|" + userInfo2.getPassword() + "|" + userInfo2.getImeiNo() + "|" + userInfo2.getSerialNo() + "|NA|" + edit_con_id.getText().toString().trim() + "|NA");
-                } else if (edit_acount_no.getText().toString().trim().length() > 0) {
-                    setup_dialog.dismiss();
-                    new MRULoader().execute(userInfo2.getUserID() + "|" + userInfo2.getPassword() + "|" + userInfo2.getImeiNo() + "|" + userInfo2.getSerialNo() + "|NA|NA|" + edit_acount_no.getText().toString().trim());
-                } else if (edit_book_no.getText().toString().trim().length() > 0) {
-                    setup_dialog.dismiss();
-                    new MRULoader().execute(userInfo2.getUserID() + "|" + userInfo2.getPassword() + "|" + userInfo2.getImeiNo() + "|" + userInfo2.getSerialNo() + "|" + edit_book_no.getText().toString().trim() + "|NA|NA");
-                } else {
-                    Toast.makeText(MainActivity.this, "Please Enter Cons Id or Account No or Book No", Toast.LENGTH_SHORT).show();
-                }
+                new MRULoader().execute(userInfo2.getUserID() + "|" + userInfo2.getPassword() + "|" + userInfo2.getImeiNo() + "|" + userInfo2.getSerialNo() + "|NA|" + edit_con_id.getText().toString().trim() + "|NA");
+            } else if (edit_acount_no.getText().toString().trim().length() > 0) {
+                setup_dialog.dismiss();
+                new MRULoader().execute(userInfo2.getUserID() + "|" + userInfo2.getPassword() + "|" + userInfo2.getImeiNo() + "|" + userInfo2.getSerialNo() + "|NA|NA|" + edit_acount_no.getText().toString().trim());
+            } else if (edit_book_no.getText().toString().trim().length() > 0) {
+                setup_dialog.dismiss();
+                new MRULoader().execute(userInfo2.getUserID() + "|" + userInfo2.getPassword() + "|" + userInfo2.getImeiNo() + "|" + userInfo2.getSerialNo() + "|" + edit_book_no.getText().toString().trim() + "|NA|NA");
+            } else {
+                Toast.makeText(MainActivity.this, "Please Enter Cons Id or Account No or Book No", Toast.LENGTH_SHORT).show();
             }
         });
         setup_dialog.show();
-
     }
-
     private void setUpDialog() {
  /* Intent intent=new Intent(MainActivity.this,BookNoActivity.class);
           startActivity(intent);*/
@@ -655,35 +652,24 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         setup_dialog.setContentView(R.layout.setup_dialog);
         setup_dialog.setCancelable(false);
         // set values for custom dialog components - text, image and button
-        TextView button_mru = (TextView) setup_dialog.findViewById(R.id.button_mru);
-        TextView button_print = (TextView) setup_dialog.findViewById(R.id.button_print);
-        ImageView close_setup = (ImageView) setup_dialog.findViewById(R.id.close_setup);
-        close_setup.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                setup_dialog.dismiss();
+        TextView button_mru =  setup_dialog.findViewById(R.id.button_mru);
+        TextView button_print =  setup_dialog.findViewById(R.id.button_print);
+        ImageView close_setup =  setup_dialog.findViewById(R.id.close_setup);
+        close_setup.setOnClickListener(v -> setup_dialog.dismiss());
+        button_mru.setOnClickListener(v -> {
+            // Close dialog
+            setup_dialog.dismiss();
+            if (Utiilties.isOnline(MainActivity.this)) {
+                UserInfo2 userInfo2 = CommonPref.getUserDetails(MainActivity.this);
+                new MRUAlocatar(MainActivity.this, true).execute(userInfo2.getUserID() + "|" + userInfo2.getPassword() + "|" + userInfo2.getImeiNo() + "|" + userInfo2.getSerialNo());
+            } else {
+                Toast.makeText(MainActivity.this, "No Internet Connection !", Toast.LENGTH_SHORT).show();
             }
         });
-        button_mru.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // Close dialog
-                setup_dialog.dismiss();
-                if (Utiilties.isOnline(MainActivity.this)) {
-                    UserInfo2 userInfo2 = CommonPref.getUserDetails(MainActivity.this);
-                    new MRUAlocatar(MainActivity.this, true).execute(userInfo2.getUserID() + "|" + userInfo2.getPassword() + "|" + userInfo2.getImeiNo() + "|" + userInfo2.getSerialNo());
-                } else {
-                    Toast.makeText(MainActivity.this, "No Internet Connection !", Toast.LENGTH_SHORT).show();
-                }
-            }
-        });
-        button_print.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // Configure printer
-                setup_dialog.dismiss();
-                AlertDialogForPrinter();
-            }
+        button_print.setOnClickListener(v -> {
+            // Configure printer
+            setup_dialog.dismiss();
+            AlertDialogForPrinter();
         });
         setup_dialog.show();
     }
@@ -697,44 +683,36 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         // set the custom dialog components - text, image and button
 
-        final RadioButton epson = (RadioButton) dialog.findViewById(R.id.Epson);
-        final RadioButton Analogics = (RadioButton) dialog.findViewById(R.id.Analogics);
-        final RadioButton tvs = (RadioButton) dialog.findViewById(R.id.tvs);
+        final RadioButton epson =  dialog.findViewById(R.id.Epson);
+        final RadioButton Analogics =  dialog.findViewById(R.id.Analogics);
+        final RadioButton tvs =  dialog.findViewById(R.id.tvs);
 
-        Button Cancel = (Button) dialog.findViewById(R.id.btn_cancel);
+        Button Cancel =  dialog.findViewById(R.id.btn_cancel);
         // if button is clicked, close the custom dialog
-        Cancel.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+        Cancel.setOnClickListener(v -> dialog.dismiss());
+        Button Ok =  dialog.findViewById(R.id.btn_OK);
+        // if button is clicked, close the custom dialog
+        Ok.setOnClickListener(v -> {
+            if (epson.isChecked() && Analogics.isChecked()) {
+
+                Toast.makeText(getBaseContext(), "Please Select One Printer", Toast.LENGTH_SHORT).show();
+            } else if (epson.isChecked()) {
+                //  Toast.makeText(getBaseContext(), "Epson", Toast.LENGTH_SHORT).show();
+                CommonPref.setPrinterType(getApplicationContext(), "E");
                 dialog.dismiss();
+                bluetooth(1);
+            } else if (Analogics.isChecked()) {
+                //  Toast.makeText(getBaseContext(), "Analogics", Toast.LENGTH_SHORT).show();
+                startActivity(new Intent(getApplicationContext(), AnalogicsPrinterSetupActivity.class));
+                dialog.dismiss();
+                //bluetooth(2);
+            } else if (tvs.isChecked()) {
+                //  Toast.makeText(getBaseContext(), "Analogics", Toast.LENGTH_SHORT).show();
+                dialog.dismiss();
+
+                bluetooth(2);
             }
-        });
-        Button Ok = (Button) dialog.findViewById(R.id.btn_OK);
-        // if button is clicked, close the custom dialog
-        Ok.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (epson.isChecked() && Analogics.isChecked()) {
 
-                    Toast.makeText(getBaseContext(), "Please Select One Printer", Toast.LENGTH_SHORT).show();
-                } else if (epson.isChecked()) {
-                    //  Toast.makeText(getBaseContext(), "Epson", Toast.LENGTH_SHORT).show();
-                    CommonPref.setPrinterType(getApplicationContext(), "E");
-                    dialog.dismiss();
-                    bluetooth(1);
-                } else if (Analogics.isChecked()) {
-                    //  Toast.makeText(getBaseContext(), "Analogics", Toast.LENGTH_SHORT).show();
-                    startActivity(new Intent(getApplicationContext(), AnalogicsPrinterSetupActivity.class));
-                    dialog.dismiss();
-                    //bluetooth(2);
-                } else if (tvs.isChecked()) {
-                    //  Toast.makeText(getBaseContext(), "Analogics", Toast.LENGTH_SHORT).show();
-                    dialog.dismiss();
-
-                    bluetooth(2);
-                }
-
-            }
         });
 
         dialog.show();
@@ -792,11 +770,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     result = WebHandler.callByPostwithoutparameter(Urls_this_pro.DOWNLOAD_MRU_URL + reqString(String.valueOf(strings[0])));
                 } else {
                     alertDialog.setMessage("Your device must have atleast Kitkat or Above Version");
-                    alertDialog.setButton("OK", new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int which) {
-                            dialog.dismiss();
-                        }
-                    });
+                    alertDialog.setButton("OK", (dialog, which) -> dialog.dismiss());
                     alertDialog.show();
                 }
                 if (result != null) {
@@ -826,21 +800,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 } else {
                     alertDialog.setTitle("MRU Download");
                     alertDialog.setMessage(" No data Found !");
-                    alertDialog.setButton("OK", new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int which) {
-                            alertDialog.dismiss();
-                        }
-                    });
+                    alertDialog.setButton("OK", (dialog, which) -> alertDialog.dismiss());
                     alertDialog.show();
                 }
             } else {
                 alertDialog.setTitle("MRU Download");
                 alertDialog.setMessage(" Something went wrong !");
-                alertDialog.setButton("OK", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        alertDialog.dismiss();
-                    }
-                });
+                alertDialog.setButton("OK", (dialog, which) -> alertDialog.dismiss());
                 alertDialog.show();
             }
             if (this.dialog1.isShowing()) this.dialog1.cancel();
@@ -858,6 +824,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
             if (!mBluetoothAdapter.isEnabled()) {
                 Toast.makeText(MainActivity.this, "Bluetooth about to start.", Toast.LENGTH_SHORT).show();
+                if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.BLUETOOTH_CONNECT) == PackageManager.PERMISSION_DENIED) {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                        ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.BLUETOOTH_CONNECT}, 2);
+                        return;
+                    }
+                }
                 startActivityForResult(new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE), REQUEST_ENABLE_BT);
             } else {
                 if (printid == 1) {
@@ -874,11 +846,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 } else if (printid == 2) {
                     printid1 = 2;
                     if (Build.VERSION.SDK_INT < 23) {
-                       // startActivity(new Intent(getApplicationContext(), BixolonSetupActivity.class));
+                        // startActivity(new Intent(getApplicationContext(), BixolonSetupActivity.class));
                         gotoNext();
                     } else {
                         if (checkAndRequestPermissions()) {
-                          //  startActivity(new Intent(getApplicationContext(), BixolonSetupActivity.class));
+                            //  startActivity(new Intent(getApplicationContext(), BixolonSetupActivity.class));
                             gotoNext();
                         }
                     }
@@ -886,10 +858,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 }
 
             }
-
-
         } catch (Exception e) {
             // TODO Auto-generated catch block
+            e.printStackTrace();
             return;
         }
     }
@@ -898,17 +869,27 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     protected void onStop() {
         super.onStop();
     }
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
     }
 
     private boolean checkAndRequestPermissions() {
-
         int storage = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE);
         int storage2 = ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
         int location = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION);
+        int courselocation = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION);
         int camera = ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA);
+        int bluetooth = ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH);
+        int bluetooth_scan = 0;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
+            bluetooth_scan = ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_SCAN);
+        }
+        int bluetooth_Connect = 0;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
+            bluetooth_Connect = ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT);
+        }
 
         List<String> listPermissionsNeeded = new ArrayList<>();
 
@@ -921,8 +902,24 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if (location != PackageManager.PERMISSION_GRANTED) {
             listPermissionsNeeded.add(Manifest.permission.ACCESS_FINE_LOCATION);
         }
+        if (courselocation != PackageManager.PERMISSION_GRANTED) {
+            listPermissionsNeeded.add(Manifest.permission.ACCESS_COARSE_LOCATION);
+        }
         if (camera != PackageManager.PERMISSION_GRANTED) {
             listPermissionsNeeded.add(Manifest.permission.CAMERA);
+        }
+        if (bluetooth != PackageManager.PERMISSION_GRANTED) {
+            listPermissionsNeeded.add(Manifest.permission.BLUETOOTH);
+        }
+        if (bluetooth_scan != PackageManager.PERMISSION_GRANTED) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                listPermissionsNeeded.add(Manifest.permission.BLUETOOTH_SCAN);
+            }
+        }
+        if (bluetooth_Connect != PackageManager.PERMISSION_GRANTED) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                listPermissionsNeeded.add(Manifest.permission.BLUETOOTH_CONNECT);
+            }
         }
 
         if (!listPermissionsNeeded.isEmpty()) {
@@ -948,7 +945,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     }
                 } else {
                     //You did not accept the request can not use the functionality.
-                    Toast.makeText(this, "Please enable all permissions !", Toast.LENGTH_SHORT).show();
+                   // Toast.makeText(this, "Please enable all permissions !", Toast.LENGTH_SHORT).show();
+                    if (printid1 == 1) {
+                        startActivity(new Intent(getApplicationContext(), ConfigurePrinterActivity.class));
+                    } else {
+                        //   startActivity(new Intent(getApplicationContext(), BixolonSetupActivity.class));
+                        gotoNext();
+                    }
                 }
                 break;
         }
@@ -966,7 +969,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     MainActivity.this,
                     0, // id, optional
                     someIntent, // intent to launch
-                    PendingIntent.FLAG_CANCEL_CURRENT); // PendintIntent flag
+                    PendingIntent.FLAG_CANCEL_CURRENT | PendingIntent.FLAG_MUTABLE); // PendintIntent flag
             AlarmManager alarms = (AlarmManager) getSystemService(
                     Context.ALARM_SERVICE);
             //
@@ -974,7 +977,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     when.getTime(), AlarmManager.INTERVAL_HALF_HOUR
                     ,
                     pendingIntent);
-
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -985,23 +987,24 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 .setTitle("Exit ?")
                 .setMessage("Are you sure you want to exit?")
                 .setNegativeButton(android.R.string.no, null)
-                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-
-                    public void onClick(DialogInterface arg0, int arg1) {
-                        MainActivity.super.onBackPressed();
-                        //finish();
-                    }
-
+                .setPositiveButton(android.R.string.yes, (arg0, arg1) -> {
+                    MainActivity.super.onBackPressed();
+                    //finish();
                 }).create().show();
-
     }
     private void gotoNext() {
-            Intent intent = new Intent(MainActivity.this,
-                    Activity_DeviceList.class);
-                         startActivity(intent);
+        Intent intent = new Intent(MainActivity.this,
+                Activity_DeviceList.class);
+        startActivity(intent);
     }
 
     public void Conneting() {
+        if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.BLUETOOTH_CONNECT) == PackageManager.PERMISSION_DENIED) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.BLUETOOTH_CONNECT}, 2);
+                return;
+            }
+        }
         if (btAdapt.isDiscovering())
             btAdapt.cancelDiscovery();
               BluetoothDevice btDev = btAdapt.getRemoteDevice(session.getKeyMac());
@@ -1009,21 +1012,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             btDev_str = btDev.toString();
             toothAddress = btDev_str;
             pd = ProgressDialog.show(MainActivity.this, "Please Wait", "Connecting");
-            thread = new Thread(new Runnable() {
-
-                @Override
-                public void run() {
-                    // TODO Auto-generated method stub
-                    try {
-                        int portOpen = HPRTPrinterHelper.PortOpen("Bluetooth," + btDev_str);
-                        message = new Message();
-                        message.what = portOpen;
-                        handler_bt.sendMessage(message);
+            thread = new Thread(() -> {
+                // TODO Auto-generated method stub
+                try {
+                    int portOpen = HPRTPrinterHelper.PortOpen("Bluetooth," + btDev_str);
+                    message = new Message();
+                    message.what = portOpen;
+                    handler_bt.sendMessage(message);
 //                            Log.e("", "msg:"+portOpen);
-                    } catch (Exception e) {
-                        // TODO Auto-generated catch block
-                        e.printStackTrace();
-                    }
+                } catch (Exception e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
                 }
             });
             thread.start();
@@ -1050,21 +1049,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 /*Toast.makeText(getApplicationContext(),
                         "Failed", Toast.LENGTH_SHORT).show();*/
                 pd.dismiss();// 关闭ProgressDialog
-                thread = new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        // TODO Auto-generated method stub
-                        try {
-                            int portOpen = HPRTPrinterHelper.PortOpen("Bluetooth," + btDev_str);
-                            message = new Message();
-                            message.what = portOpen;
-                            handler_bt.sendMessage(message);
+                thread = new Thread(() -> {
+                    // TODO Auto-generated method stub
+                    try {
+                        int portOpen = HPRTPrinterHelper.PortOpen("Bluetooth," + btDev_str);
+                        message = new Message();
+                        message.what = portOpen;
+                        handler_bt.sendMessage(message);
 
 //                            Log.e("", "msg:"+portOpen);
-                        } catch (Exception e) {
-                            // TODO Auto-generated catch block
-                            e.printStackTrace();
-                        }
+                    } catch (Exception e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
                     }
                 });
                 thread.start();

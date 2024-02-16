@@ -1,23 +1,39 @@
 package com.bih.nic.e_wallet.entity;
 
+import com.google.gson.annotations.SerializedName;
+
 /**
  * Created by NIC2 on 08-03-2018.
  */
 
 public class UserInfo2 {
+    @SerializedName("MessageString")
     private String MessageString;
+    @SerializedName("UserID")
     private String UserID;
+    @SerializedName("UserName")
     private String UserName;
+    @SerializedName("SubDiv")
     private String SubDiv;
+    @SerializedName("SubdivName")
     private String SubdivName;
+    @SerializedName("WalletId")
     private String WalletId;
+    @SerializedName("WalletAmount")
     private String WalletAmount;
+    @SerializedName("Authenticated")
     private boolean Authenticated;
+    @SerializedName("ImeiNo")
     private String ImeiNo;
+    @SerializedName("ContactNo")
     private String ContactNo;
+    @SerializedName("IFSCCode")
     private String IFSCCode;
+    @SerializedName("password")
     private String password;
+    @SerializedName("serialNo")
     private String serialNo;
+    @SerializedName("ACCT_NO")
     private String ACCT_NO;
 
 

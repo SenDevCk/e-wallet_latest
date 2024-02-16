@@ -22,21 +22,17 @@ public class GrievanceLoader extends AsyncTask<String, Void, String> {
     private Activity activity;
     private ProgressDialog dialog1;
     private AlertDialog alertDialog;
-
     public GrievanceLoader(Activity activity) {
         this.activity = activity;
         dialog1 = new ProgressDialog(this.activity);
         alertDialog = new AlertDialog.Builder(this.activity).create();
     }
-
     @Override
     protected void onPreExecute() {
         dialog1.setMessage("Loading...");
         dialog1.setCancelable(false);
         dialog1.show();
     }
-
-
     @Override
     protected String doInBackground(String... strings) {
         String result = "";

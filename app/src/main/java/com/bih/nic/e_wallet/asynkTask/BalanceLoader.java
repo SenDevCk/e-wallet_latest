@@ -32,7 +32,6 @@ public class BalanceLoader extends AsyncTask<String, Void, String> {
     }
     @Override
     protected void onPreExecute() {
-
     }
 
 

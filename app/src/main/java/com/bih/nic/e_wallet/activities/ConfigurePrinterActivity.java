@@ -1,10 +1,6 @@
 package com.bih.nic.e_wallet.activities;
-
-import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
-
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
@@ -19,11 +15,9 @@ import com.bih.nic.e_wallet.R;
 import com.bih.nic.e_wallet.utilitties.CommonPref;
 import com.bih.nic.e_wallet.utilitties.ShowMsg;
 import com.epson.epos2.Epos2Exception;
-import com.epson.epos2.discovery.DeviceInfo;
 import com.epson.epos2.discovery.Discovery;
 import com.epson.epos2.discovery.DiscoveryListener;
 import com.epson.epos2.discovery.FilterOption;
-
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -34,7 +28,6 @@ public class ConfigurePrinterActivity extends AppCompatActivity implements View.
     private SimpleAdapter mPrinterListAdapter = null;
     private FilterOption mFilterOption = null;
     Toolbar toolbar_con_printer;
-    ListView list;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -45,12 +38,12 @@ public class ConfigurePrinterActivity extends AppCompatActivity implements View.
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         mContext = this;
-        Button button = (Button)findViewById(R.id.btnRestart);
+        Button button = findViewById(R.id.btnRestart);
         button.setOnClickListener(this);
         mPrinterList = new ArrayList<HashMap<String, String>>();
         mPrinterListAdapter = new SimpleAdapter(this, mPrinterList, R.layout.list_at, new String[] { "PrinterName", "Target" },
                 new int[] { R.id.PrinterName, R.id.Target });
-        list = (ListView)findViewById(R.id.lstReceiveData);
+        ListView  list = findViewById(R.id.lstReceiveData);
         list.setAdapter(mPrinterListAdapter);
         list.setOnItemClickListener(this);
         mFilterOption = new FilterOption();
@@ -127,23 +120,15 @@ public class ConfigurePrinterActivity extends AppCompatActivity implements View.
             ShowMsg.showException(e, "stop", mContext);
         }
     }
-
-    private final DiscoveryListener mDiscoveryListener = new DiscoveryListener() {
+    private final DiscoveryListener mDiscoveryListener = deviceInfo -> runOnUiThread(new Runnable() {
         @Override
-        public void onDiscovery(final DeviceInfo deviceInfo) {
-            runOnUiThread(new Runnable() {
-                @Override
-                public synchronized void run() {
-                    HashMap<String, String> item = new HashMap<String, String>();
-                    item.put("PrinterName", deviceInfo.getDeviceName());
-                    item.put("Target", deviceInfo.getTarget());
-                    mPrinterList.add(item);
-                    mPrinterListAdapter.notifyDataSetChanged();
-                }
-            });
+        public synchronized void run() {
+            HashMap<String, String> item = new HashMap<String, String>();
+            item.put("PrinterName", deviceInfo.getDeviceName());
+            item.put("Target", deviceInfo.getTarget());
+            mPrinterList.add(item);
+            mPrinterListAdapter.notifyDataSetChanged();
         }
-    };
-
-
+    });
 }
 

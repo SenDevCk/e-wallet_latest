@@ -40,7 +40,7 @@ public class ChangeMpinActivity extends AppCompatActivity implements View.OnClic
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_change_mpin);
-        toolbar_mpin=(Toolbar)findViewById(R.id.toolbar_mpin);
+        toolbar_mpin=findViewById(R.id.toolbar_mpin);
         toolbar_mpin.setTitle("Change M-Pin");
         setSupportActionBar(toolbar_mpin);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -49,10 +49,10 @@ public class ChangeMpinActivity extends AppCompatActivity implements View.OnClic
     }
 
     private void init() {
-        old_m_pin=(EditText) findViewById(R.id.old_m_pin);
-        new_m_pin1=(EditText) findViewById(R.id.new_m_pin1);
-        new_m_pin2=(EditText) findViewById(R.id.new_m_pin2);
-        button_change_mpin=(Button)findViewById(R.id.button_change_mpin);
+        old_m_pin= findViewById(R.id.old_m_pin);
+        new_m_pin1= findViewById(R.id.new_m_pin1);
+        new_m_pin2= findViewById(R.id.new_m_pin2);
+        button_change_mpin=findViewById(R.id.button_change_mpin);
         button_change_mpin.setOnClickListener(this);
     }
 

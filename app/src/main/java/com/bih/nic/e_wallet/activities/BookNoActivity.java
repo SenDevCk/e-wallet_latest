@@ -23,13 +23,13 @@ public class BookNoActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_book_no);
-        toolbar_book_no=(Toolbar)findViewById(R.id.toolbar_book_no);
+        toolbar_book_no=findViewById(R.id.toolbar_book_no);
         toolbar_book_no.setTitle("Select Payment");
         setSupportActionBar(toolbar_book_no);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         flag=getIntent().getBooleanExtra("flag",false);
-        book_list=(ListView)findViewById(R.id.book_list);
+        book_list=findViewById(R.id.book_list);
         book_list.setAdapter(new BookNoAdapter(BookNoActivity.this,flag));
     }
     @Override

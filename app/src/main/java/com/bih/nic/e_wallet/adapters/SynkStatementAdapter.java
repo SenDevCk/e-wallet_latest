@@ -82,12 +82,12 @@ public class SynkStatementAdapter extends BaseAdapter {
         } else {
             ViewHolder viewHolder=new ViewHolder();
             convertView = layoutInflater.inflate(R.layout.statement_item, null, false);
-            viewHolder.text_recept_no=(TextView) convertView.findViewById(R.id.text_recept_no);
-            viewHolder.text_amount=(TextView) convertView.findViewById(R.id.text_amount);
-            viewHolder.text_message_string=(TextView) convertView.findViewById(R.id.text_message_string);
-            viewHolder.text_view=(TextView) convertView.findViewById(R.id.text_view);
-            viewHolder.name_conid=(TextView) convertView.findViewById(R.id.name_conid);
-            viewHolder.text_date=(TextView) convertView.findViewById(R.id.text_date);
+            viewHolder.text_recept_no= convertView.findViewById(R.id.text_recept_no);
+            viewHolder.text_amount= convertView.findViewById(R.id.text_amount);
+            viewHolder.text_message_string= convertView.findViewById(R.id.text_message_string);
+            viewHolder.text_view= convertView.findViewById(R.id.text_view);
+            viewHolder.name_conid= convertView.findViewById(R.id.name_conid);
+            viewHolder.text_date= convertView.findViewById(R.id.text_date);
             viewHolder.name_conid.setVisibility(View.VISIBLE);
             viewHolder.name_conid.setText("Con ID: "+ statementMS.get(position-1).getCON_ID()+"\n"+ statementMS.get(position-1).getCNAME());
 
@@ -121,37 +121,29 @@ public class SynkStatementAdapter extends BaseAdapter {
             }
             viewHolder.text_amount.setText("Rs. "+ statementMS.get(position-1).getPAY_AMT());
             viewHolder.text_message_string.setText(statementMS.get(position-1).getMESSAGE_STRING());
-            viewHolder.text_view.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Intent intent=null;
-                    if (statementMS.get(position-1).getTransStatus().equalsIgnoreCase("TC")) {
-                        intent = new Intent(activity, PrintReceptActivity.class);
-                        intent.putExtra("object", statementMS.get(position-1));
-                        activity.startActivity(intent);
-                    }
-                    else if(statementMS.get(position-1).getTransStatus().equalsIgnoreCase("TI")|| statementMS.get(position-1).getTransStatus().equalsIgnoreCase("TP")){
-                        UserInfo2 userInfo2= CommonPref.getUserDetails(activity);
-                        if (userInfo2!=null) {
-                            if (statementMS.get(position-1).getRCPT_NO().equals("NA")){
-                                final AlertDialog alertDialog = new AlertDialog.Builder(activity).create();
-                                alertDialog.setMessage("Payment you have done is pending for this Consumer . If status pending remains after sync then pay again after 15 minutes.");
-                                alertDialog.setCancelable(false);
-                                alertDialog.setButton("OK", new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialogInterface, int i) {
-                                        dialogInterface.dismiss();
-                                    }
-                                });
-                                alertDialog.show();
-                            }else {
-                                verifier = (Verifier) new Verifier(SynkStatementAdapter.this,  activity).execute(userInfo2.getUserID() + "|" + GlobalVariables.LoggedUser.getPassword() + "|" + userInfo2.getImeiNo() + "|" + userInfo2.getSerialNo() + "|" + statementMS.get(position - 1).getTRANS_ID());
-                            }
+            viewHolder.text_view.setOnClickListener(v -> {
+                Intent intent=null;
+                if (statementMS.get(position-1).getTransStatus().equalsIgnoreCase("TC")) {
+                    intent = new Intent(activity, PrintReceptActivity.class);
+                    intent.putExtra("object", statementMS.get(position-1));
+                    activity.startActivity(intent);
+                }
+                else if(statementMS.get(position-1).getTransStatus().equalsIgnoreCase("TI")|| statementMS.get(position-1).getTransStatus().equalsIgnoreCase("TP")){
+                    UserInfo2 userInfo2= CommonPref.getUserDetails(activity);
+                    if (userInfo2!=null) {
+                        if (statementMS.get(position-1).getRCPT_NO().equals("NA")){
+                            final AlertDialog alertDialog = new AlertDialog.Builder(activity).create();
+                            alertDialog.setMessage("Payment you have done is pending for this Consumer . If status pending remains after sync then pay again after 15 minutes.");
+                            alertDialog.setCancelable(false);
+                            alertDialog.setButton("OK", (dialogInterface, i) -> dialogInterface.dismiss());
+                            alertDialog.show();
+                        }else {
+                            verifier = (Verifier) new Verifier(SynkStatementAdapter.this,  activity).execute(userInfo2.getUserID() + "|" + GlobalVariables.LoggedUser.getPassword() + "|" + userInfo2.getImeiNo() + "|" + userInfo2.getSerialNo() + "|" + statementMS.get(position - 1).getTRANS_ID());
                         }
                     }
-                    else if(statementMS.get(position-1).getTransStatus().equalsIgnoreCase("TF")){
-                        Toast.makeText(activity, "Failed !", Toast.LENGTH_SHORT).show();
-                    }
+                }
+                else if(statementMS.get(position-1).getTransStatus().equalsIgnoreCase("TF")){
+                    Toast.makeText(activity, "Failed !", Toast.LENGTH_SHORT).show();
                 }
             });
             String[] tokens= Utiilties.convertTimestampToStringSlash(statementMS.get(position-1).getPayDate()).split(" ");

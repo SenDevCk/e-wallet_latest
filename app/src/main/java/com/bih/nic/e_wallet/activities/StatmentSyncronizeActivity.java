@@ -35,14 +35,13 @@ public class StatmentSyncronizeActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_syncronize);
-        toolbar_synk = (Toolbar) findViewById(R.id.toolbar_synk);
+        toolbar_synk =  findViewById(R.id.toolbar_synk);
         toolbar_synk.setTitle("Syncronize Payments");
         setSupportActionBar(toolbar_synk);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
-        transaction_history_list = (ListView) findViewById(R.id.transaction_history_list);
-        text_warning_statement = (TextView) findViewById(R.id.text_warning_statement);
-
+        transaction_history_list =  findViewById(R.id.transaction_history_list);
+        text_warning_statement =  findViewById(R.id.text_warning_statement);
     }
 
     @Override
@@ -71,6 +70,7 @@ public class StatmentSyncronizeActivity extends AppCompatActivity {
         return true;
 
     }
+
 
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {

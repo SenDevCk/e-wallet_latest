@@ -40,28 +40,25 @@ import com.bih.nic.e_wallet.webservices.WebServiceHelper;
 import java.util.ArrayList;
 
 public class ConsumerListActivity extends AppCompatActivity {
-
     RecyclerView recycler_list_consumer;
     TextView text_no_data_found;
     Toolbar toolbar_sel_topup;
     ConsumerItemAdapter consumerItemAdapter;
     ArrayList<MRUEntity> mruEntities;
     RelativeLayout rel_search;
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_consumer);
-        toolbar_sel_topup=(Toolbar)findViewById(R.id.toolbar_sel_topup);
+        toolbar_sel_topup=findViewById(R.id.toolbar_sel_topup);
         toolbar_sel_topup.setTitle("Search Consumer List");
         setSupportActionBar(toolbar_sel_topup);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 
-        text_no_data_found=(TextView) findViewById(R.id.text_no_data_found);
-        recycler_list_consumer=(RecyclerView)findViewById(R.id.recycler_list_consumer);
-        rel_search=(RelativeLayout)findViewById(R.id.rel_search);
+        text_no_data_found= findViewById(R.id.text_no_data_found);
+        recycler_list_consumer=findViewById(R.id.recycler_list_consumer);
+        rel_search=findViewById(R.id.rel_search);
         rel_search.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -109,9 +106,9 @@ public class ConsumerListActivity extends AppCompatActivity {
         setup_dialog.setTitle("");
         setup_dialog.setCancelable(false);
         // set values for custom dialog components - text, image and button
-        final EditText edit_con_id = (EditText) setup_dialog.findViewById(R.id.edit_con_id);
-        final EditText edit_acount_no = (EditText) setup_dialog.findViewById(R.id.edit_acount_no);
-        final EditText edit_book_no = (EditText) setup_dialog.findViewById(R.id.edit_book_no);
+        final EditText edit_con_id =  setup_dialog.findViewById(R.id.edit_con_id);
+        final EditText edit_acount_no =  setup_dialog.findViewById(R.id.edit_acount_no);
+        final EditText edit_book_no =  setup_dialog.findViewById(R.id.edit_book_no);
 
         edit_con_id.addTextChangedListener(new TextWatcher() {
             @Override
@@ -177,34 +174,31 @@ public class ConsumerListActivity extends AppCompatActivity {
                 }
             }
         });
-        ImageView close_setup = (ImageView) setup_dialog.findViewById(R.id.img_close);
+        ImageView close_setup =  setup_dialog.findViewById(R.id.img_close);
         close_setup.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 setup_dialog.dismiss();
             }
         });
-        Button search_for_mru = (Button) setup_dialog.findViewById(R.id.search_for_mru);
-        search_for_mru.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // Close dialog
-                    UserInfo2 userInfo2= CommonPref.getUserDetails(ConsumerListActivity.this);
-                    if (edit_con_id.getText().toString().trim().length()>0) {
-                        setup_dialog.dismiss();
-                        new MRULoader().execute(userInfo2.getUserID() + "|" +userInfo2.getPassword() + "|" + userInfo2.getImeiNo() + "|" + userInfo2.getSerialNo() + "|NA|" + edit_con_id.getText().toString().trim() + "|NA");
-                    }else if (edit_acount_no.getText().toString().trim().length()>0) {
-                        setup_dialog.dismiss();
-                        new MRULoader().execute(userInfo2.getUserID() + "|" + userInfo2.getPassword() + "|" + userInfo2.getImeiNo() + "|" + userInfo2.getSerialNo() + "|NA|NA|" + edit_acount_no.getText().toString().trim());
-                    }
-                    else if (edit_book_no.getText().toString().trim().length()>0) {
-                        setup_dialog.dismiss();
-                        new MRULoader().execute(userInfo2.getUserID() + "|" + userInfo2.getPassword() + "|" + userInfo2.getImeiNo() + "|" + userInfo2.getSerialNo() +"|"+edit_book_no.getText().toString().trim() +"|NA|NA");
-                    }
-                    else {
-                        Toast.makeText(ConsumerListActivity.this, "Please Enter Cons Id or Account No or Book No", Toast.LENGTH_SHORT).show();
-                    }
-            }
+        Button search_for_mru =  setup_dialog.findViewById(R.id.search_for_mru);
+        search_for_mru.setOnClickListener(v -> {
+            // Close dialog
+                UserInfo2 userInfo2= CommonPref.getUserDetails(ConsumerListActivity.this);
+                if (edit_con_id.getText().toString().trim().length()>0) {
+                    setup_dialog.dismiss();
+                    new MRULoader().execute(userInfo2.getUserID() + "|" +userInfo2.getPassword() + "|" + userInfo2.getImeiNo() + "|" + userInfo2.getSerialNo() + "|NA|" + edit_con_id.getText().toString().trim() + "|NA");
+                }else if (edit_acount_no.getText().toString().trim().length()>0) {
+                    setup_dialog.dismiss();
+                    new MRULoader().execute(userInfo2.getUserID() + "|" + userInfo2.getPassword() + "|" + userInfo2.getImeiNo() + "|" + userInfo2.getSerialNo() + "|NA|NA|" + edit_acount_no.getText().toString().trim());
+                }
+                else if (edit_book_no.getText().toString().trim().length()>0) {
+                    setup_dialog.dismiss();
+                    new MRULoader().execute(userInfo2.getUserID() + "|" + userInfo2.getPassword() + "|" + userInfo2.getImeiNo() + "|" + userInfo2.getSerialNo() +"|"+edit_book_no.getText().toString().trim() +"|NA|NA");
+                }
+                else {
+                    Toast.makeText(ConsumerListActivity.this, "Please Enter Cons Id or Account No or Book No", Toast.LENGTH_SHORT).show();
+                }
         });
         setup_dialog.show();
     }
@@ -261,11 +255,7 @@ public class ConsumerListActivity extends AppCompatActivity {
             }else{
                 alertDialog.setTitle("MRU Downloaded");
                 alertDialog.setMessage(" MRU not Downloaded !");
-                alertDialog.setButton("OK", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        alertDialog.dismiss();
-                    }
-                });
+                alertDialog.setButton("OK", (dialog, which) -> alertDialog.dismiss());
                 alertDialog.show();
             }
             if (this.dialog1.isShowing()) this.dialog1.cancel();

@@ -29,17 +29,17 @@ public class ProfileActivity extends AppCompatActivity {
     }
 
     private void init() {
-        text_deleer_name=(TextView)findViewById(R.id.text_deleer_name);
-        text_deleer_acc=(TextView)findViewById(R.id.text_deleer_acc);
+        text_deleer_name=findViewById(R.id.text_deleer_name);
+        text_deleer_acc=findViewById(R.id.text_deleer_acc);
         text_deleer_name.setText(CommonPref.getUserDetails(ProfileActivity.this).getUserName());
         //text_deleer_acc.setText("xxxxxxxx"+walet_id.substring(walet_id.length()-2,walet_id.length()));
         text_deleer_acc.setText(CommonPref.getUserDetails(ProfileActivity.this).getUserID());
 
-        edit_name2=(TextView)findViewById(R.id.edit_name2);
-        edit_walet_id=(TextView)findViewById(R.id.edit_walet_id);
-        edit_mobile2=(TextView)findViewById(R.id.edit_mobile2);
-        edit_subdivision=(TextView)findViewById(R.id.edit_subdivision);
-        edit_ifsc=(TextView)findViewById(R.id.edit_ifsc);
+        edit_name2=findViewById(R.id.edit_name2);
+        edit_walet_id=findViewById(R.id.edit_walet_id);
+        edit_mobile2=findViewById(R.id.edit_mobile2);
+        edit_subdivision=findViewById(R.id.edit_subdivision);
+        edit_ifsc=findViewById(R.id.edit_ifsc);
 
         edit_ifsc.setText(CommonPref.getUserDetails(ProfileActivity.this).getIFSCCode());
         edit_name2.setText(CommonPref.getUserDetails(ProfileActivity.this).getUserName());

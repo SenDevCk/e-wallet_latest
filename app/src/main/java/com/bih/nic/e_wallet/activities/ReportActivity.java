@@ -44,8 +44,8 @@ public class ReportActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 
 
-        ll_tag = (LinearLayout) findViewById(R.id.ll_tag);
-        ll_total = (LinearLayout) findViewById(R.id.ll_total);
+        ll_tag =  findViewById(R.id.ll_tag);
+        ll_total =  findViewById(R.id.ll_total);
 
         text_grand_total = (TextView) findViewById(R.id.text_grand_total);
         text_report_not_found = (TextView) findViewById(R.id.text_report_not_found);

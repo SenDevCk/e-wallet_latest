@@ -1,5 +1,3 @@
-
-
 package com.bih.nic.e_wallet.activities;
 
 
@@ -61,7 +59,7 @@ public class AnalogicsPrinterSetupActivity extends AppCompatActivity {
 
     private int BLUETOOTH_PERMISSION_CODE = 23;
 
-    int printid1=0;
+    int printid1 = 0;
     private static final int MY_PERMISSIONS_REQUEST_ACCOUNTS = 1;
 
     String address = "";
@@ -85,7 +83,7 @@ public class AnalogicsPrinterSetupActivity extends AppCompatActivity {
         // For displaying title and subtitle and change text color
         actionBar.setTitle(Html.fromHtml("<font color='#FFFFFF'>SetUp</font>"));*/
 
-        toolbar_analog_pri_set=(Toolbar)findViewById(R.id.toolbar_analog_pri_set);
+        toolbar_analog_pri_set = (Toolbar) findViewById(R.id.toolbar_analog_pri_set);
         toolbar_analog_pri_set.setTitle(Html.fromHtml("<font color='#FFFFFF'>SetUp</font>"));
         setSupportActionBar(toolbar_analog_pri_set);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -132,10 +130,10 @@ public class AnalogicsPrinterSetupActivity extends AppCompatActivity {
             public void onItemClick(AdapterView<?> parent, View view,
                                     int position, long id) {
 
-				/*
+                /*
                  * Toast.makeText(getApplicationContext(),
-				 * ""+listDevicesFound.getCount(), Toast.LENGTH_SHORT).show();
-				 */
+                 * ""+listDevicesFound.getCount(), Toast.LENGTH_SHORT).show();
+                 */
                 String selection = (String) (listDevicesFound
                         .getItemAtPosition(position));
                 Toast.makeText(getApplicationContext(),
@@ -168,13 +166,7 @@ public class AnalogicsPrinterSetupActivity extends AppCompatActivity {
 
 
         backBtnSET = (Button) findViewById(R.id.backBtnSET);
-        backBtnSET.setOnClickListener(new OnClickListener() {
-
-            public void onClick(View v) {
-                finish();
-            }
-
-        });
+        backBtnSET.setOnClickListener(v -> finish());
 
     }
 
@@ -184,7 +176,7 @@ public class AnalogicsPrinterSetupActivity extends AppCompatActivity {
         if (Build.VERSION.SDK_INT < 23) {
             //Do not need to check the permission
         } else {
-            if (checkAndRequestPermissions()){
+            if (checkAndRequestPermissions()) {
             }
         }
     }
@@ -194,6 +186,12 @@ public class AnalogicsPrinterSetupActivity extends AppCompatActivity {
             stateBluetooth.setText("Bluetooth NOT support");
         } else {
             if (bluetoothAdapter.isEnabled()) {
+                if (ContextCompat.checkSelfPermission(AnalogicsPrinterSetupActivity.this, Manifest.permission.BLUETOOTH_CONNECT) == PackageManager.PERMISSION_DENIED) {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                        ActivityCompat.requestPermissions(AnalogicsPrinterSetupActivity.this, new String[]{Manifest.permission.BLUETOOTH_CONNECT}, 2);
+                        return;
+                    }
+                }
                 if (bluetoothAdapter.isDiscovering()) {
                     stateBluetooth.setText("Bluetooth is currently in device discovery process.");
                 } else {
@@ -217,9 +215,15 @@ public class AnalogicsPrinterSetupActivity extends AppCompatActivity {
             if (Build.VERSION.SDK_INT < 23) {
                 //Do not need to check the permission
                 btArrayAdapter.clear();
+                if (ContextCompat.checkSelfPermission(AnalogicsPrinterSetupActivity.this, Manifest.permission.BLUETOOTH_CONNECT) == PackageManager.PERMISSION_DENIED) {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                        ActivityCompat.requestPermissions(AnalogicsPrinterSetupActivity.this, new String[]{Manifest.permission.BLUETOOTH_CONNECT}, 2);
+                        return;
+                    }
+                }
                 bluetoothAdapter.startDiscovery();
             } else {
-                if (checkAndRequestPermissions()){
+                if (checkAndRequestPermissions()) {
                     btArrayAdapter.clear();
                     bluetoothAdapter.startDiscovery();
                 }
@@ -246,6 +250,12 @@ public class AnalogicsPrinterSetupActivity extends AppCompatActivity {
             if (BluetoothDevice.ACTION_FOUND.equals(action)) {
                 BluetoothDevice device = intent
                         .getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
+                if (ContextCompat.checkSelfPermission(AnalogicsPrinterSetupActivity.this, Manifest.permission.BLUETOOTH_CONNECT) == PackageManager.PERMISSION_DENIED) {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                        ActivityCompat.requestPermissions(AnalogicsPrinterSetupActivity.this, new String[]{Manifest.permission.BLUETOOTH_CONNECT}, 2);
+                        return;
+                    }
+                }
                 btArrayAdapter.add(device.getAddress() + "\n"
                         + device.getName());
                 btArrayAdapter.notifyDataSetChanged();
@@ -272,6 +282,7 @@ public class AnalogicsPrinterSetupActivity extends AppCompatActivity {
         }
 
     }
+
     @Override
     public boolean onSupportNavigateUp() {
         onBackPressed();
@@ -312,14 +323,20 @@ public class AnalogicsPrinterSetupActivity extends AppCompatActivity {
 
     @Override
     public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         switch (requestCode) {
             case MY_PERMISSIONS_REQUEST_ACCOUNTS:
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     Toast.makeText(this, "All Permissions Allowed !", Toast.LENGTH_SHORT).show();
                     btArrayAdapter.clear();
+                    if (ContextCompat.checkSelfPermission(AnalogicsPrinterSetupActivity.this, Manifest.permission.BLUETOOTH_CONNECT) == PackageManager.PERMISSION_DENIED) {
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                            ActivityCompat.requestPermissions(AnalogicsPrinterSetupActivity.this, new String[]{Manifest.permission.BLUETOOTH_CONNECT}, 2);
+                            return;
+                        }
+                    }
                     bluetoothAdapter.startDiscovery();
-                }
-                else {
+                } else {
                     //You did not accept the request can not use the functionality.
                     Toast.makeText(this, "Please enable all permissions !", Toast.LENGTH_SHORT).show();
                 }

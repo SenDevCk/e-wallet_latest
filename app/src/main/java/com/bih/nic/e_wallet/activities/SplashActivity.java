@@ -13,6 +13,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Debug;
 import android.os.Environment;
 import android.os.Handler;
 import android.preference.PreferenceManager;
@@ -22,6 +23,7 @@ import android.text.Html;
 import android.util.Log;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -73,8 +75,8 @@ public class SplashActivity extends AppCompatActivity {
         MultiDex.install(getApplicationContext());
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
-        text_head_sp = (TextView) findViewById(R.id.text_head_sp);
-        text_ver = (TextView) findViewById(R.id.text_imei);
+        text_head_sp =  findViewById(R.id.text_head_sp);
+        text_ver =  findViewById(R.id.text_imei);
         Typeface face = Typeface.createFromAsset(getAssets(), "fonts/header_font.ttf");
         text_head_sp.setTypeface(face);
         DataBaseHelper db = new DataBaseHelper(this);
@@ -136,7 +138,7 @@ public class SplashActivity extends AppCompatActivity {
                     }
                     try {
                         version = getPackageManager().getPackageInfo(getPackageName(), 0).versionName;
-                       // TextView tv = (TextView) findViewById(R.id.txtVersion);
+                       // TextView tv =  findViewById(R.id.txtVersion);
                         text_ver.setText("App Version : " + version + " ( " + imei + " )");
                     } catch (PackageManager.NameNotFoundException e) {
                         e.printStackTrace();
@@ -160,7 +162,7 @@ public class SplashActivity extends AppCompatActivity {
                 }
                 try {
                     version = getPackageManager().getPackageInfo(getPackageName(), 0).versionName;
-                   // TextView tv = (TextView) findViewById(R.id.);
+                   // TextView tv =  findViewById(R.id.);
                     text_ver.setText("App Version : " + version + " ( " + imei + " )");
                 } catch (PackageManager.NameNotFoundException e) {
                 }
@@ -181,7 +183,7 @@ public class SplashActivity extends AppCompatActivity {
         }
         try {
             version = getPackageManager().getPackageInfo(getPackageName(), 0).versionName;
-          //  TextView tv = (TextView) findViewById(R.id.txtVersion);
+          //  TextView tv =  findViewById(R.id.txtVersion);
             text_ver.setText("App Version : " + version + " ( " + imei + " )");
         } catch (PackageManager.NameNotFoundException e) {
 
@@ -201,28 +203,19 @@ public class SplashActivity extends AppCompatActivity {
                 ab.setMessage(versioninfo.getUpdateMsg());
 
                 ab.setPositiveButton("Update",
-                        new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog,
-                                                int whichButton) {
-                                Intent myWebLink = new Intent(
-                                        android.content.Intent.ACTION_VIEW);
-                                myWebLink.setData(Uri.parse(versioninfo.getAppUrl()));
-                                startActivity(myWebLink);
-                                dialog.dismiss();
-                            }
+                        (dialog, whichButton) -> {
+                            Intent myWebLink = new Intent(
+                                    Intent.ACTION_VIEW);
+                            myWebLink.setData(Uri.parse(versioninfo.getAppUrl()));
+                            startActivity(myWebLink);
+                            dialog.dismiss();
                         });
                 ab.setNegativeButton("Ignore",
-                        new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog,
-                                                int whichButton) {
+                        (dialog, whichButton) -> {
 
-                                dialog.dismiss();
+                            dialog.dismiss();
 
-                                start();
-                            }
-
+                            start();
                         });
 
                 ab.show();
@@ -231,16 +224,12 @@ public class SplashActivity extends AppCompatActivity {
                 ab.setTitle(versioninfo.getUpdateTile());
                 ab.setMessage(versioninfo.getUpdateMsg());
                 ab.setPositiveButton("Update",
-                        new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog,
-                                                int whichButton) {
-                                Intent myWebLink = new Intent(android.content.Intent.ACTION_VIEW);
-                                myWebLink.setData(Uri.parse(versioninfo.getAppUrl()));
-                                startActivity(myWebLink);
-                                dialog.dismiss();
+                        (dialog, whichButton) -> {
+                            Intent myWebLink = new Intent(Intent.ACTION_VIEW);
+                            myWebLink.setData(Uri.parse(versioninfo.getAppUrl()));
+                            startActivity(myWebLink);
+                            dialog.dismiss();
 
-                            }
                         });
 
                 ab.show();
@@ -264,6 +253,7 @@ public class SplashActivity extends AppCompatActivity {
         protected void onPreExecute() {
 
         }
+
 
         @SuppressLint("WrongThread")
         @Override
@@ -294,21 +284,14 @@ public class SplashActivity extends AppCompatActivity {
                     ab.setTitle(versioninfo.getAdminTitle());
                     ab.setMessage(Html.fromHtml(versioninfo.getAdminMsg()));
                     ab.setPositiveButton("OK",
-                            new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog,
-                                                    int whichButton) {
-                                    dialog.dismiss();
-                                    showDailog(ab, versioninfo);
+                            (dialog, whichButton) -> {
+                                dialog.dismiss();
+                                showDailog(ab, versioninfo);
 
-                                }
                             });
-                    ab.setNegativeButton("Ignore", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            dialog.dismiss();
-                            start();
-                        }
+                    ab.setNegativeButton("Ignore", (dialog, which) -> {
+                        dialog.dismiss();
+                        start();
                     });
 
                     ab.show();
@@ -333,22 +316,13 @@ public class SplashActivity extends AppCompatActivity {
 
             AlertDialog.Builder ab = new AlertDialog.Builder(SplashActivity.this);
             ab.setMessage("Internet Connection is not avaliable. Please Turn ON Network Connection OR Continue With Off-line Mode.");
-            ab.setPositiveButton("Turn On Network Connection", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int whichButton) {
-                    Intent I = new Intent(android.provider.Settings.ACTION_WIRELESS_SETTINGS);
-                    startActivity(I);
-                    //new CheckUpdate().execute();
-                }
+            ab.setPositiveButton("Turn On Network Connection", (dialog, whichButton) -> {
+                Intent I = new Intent(Settings.ACTION_WIRELESS_SETTINGS);
+                startActivity(I);
+                //new CheckUpdate().execute();
             });
 
-            ab.setNegativeButton("Continue Offline", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int whichButton) {
-
-                    start();
-                }
-            });
+            ab.setNegativeButton("Continue Offline", (dialog, whichButton) -> start());
 
             ab.create().getWindow().getAttributes().windowAnimations = R.style.alert_animation;
             ab.show();
@@ -378,19 +352,14 @@ public class SplashActivity extends AppCompatActivity {
                         SplashActivity.this).create();
                 alertDialog.setTitle("No Internet Connection !");
                 alertDialog.setMessage("Enable Internet Connection for the First Time !");
-                alertDialog.setButton("OK", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        // Write your code here to execute after dialog closed
+                alertDialog.setButton("OK", (dialog, which) -> {
+                    // Write your code here to execute after dialog closed
+                    Intent I = new Intent(Settings.ACTION_WIRELESS_SETTINGS);
+                    startActivity(I);
+                    alertDialog.cancel();
 
 
-                        Intent I = new Intent(
-                                android.provider.Settings.ACTION_WIRELESS_SETTINGS);
-                        startActivity(I);
-                        alertDialog.cancel();
-
-
-                        //start();
-                    }
+                    //start();
                 });
 
                 alertDialog.show();
@@ -435,9 +404,13 @@ public class SplashActivity extends AppCompatActivity {
      }*/
 
     private void start() {
-        Intent i = new Intent(getApplicationContext(), LoginActivity.class);
-        startActivity(i);
-        SplashActivity.this.finish();
+        if(Utiilties.isEmulator() || Debug.isDebuggerConnected()) {
+            Toast.makeText(this, "You Are Using Emulator !", Toast.LENGTH_SHORT).show();
+        }else {
+            Intent i = new Intent(getApplicationContext(), LoginActivity.class);
+            startActivity(i);
+            SplashActivity.this.finish();
+        }
     }
 
     public void checkPref() {
@@ -457,9 +430,7 @@ public class SplashActivity extends AppCompatActivity {
         int receve_sms = ContextCompat.checkSelfPermission(this, Manifest.permission.RECEIVE_SMS);
         int write_ex_storage = ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
         int read_ex_storage = ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
-
         List<String> listPermissionsNeeded = new ArrayList<>();
-
         if (read_phone_state != PackageManager.PERMISSION_GRANTED) {
             listPermissionsNeeded.add(Manifest.permission.READ_PHONE_STATE);
         }
@@ -506,12 +477,9 @@ public class SplashActivity extends AppCompatActivity {
             readPhoneState();
             checkOnline();
         } else {
-            new Handler().postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    readPhoneState();
-                    start();
-                }
+            new Handler().postDelayed(() -> {
+                readPhoneState();
+                start();
             }, 1000);
         }
     }

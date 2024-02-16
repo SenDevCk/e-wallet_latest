@@ -1,5 +1,6 @@
 package com.bih.nic.e_wallet.dataBaseHandler;
 
+import android.annotation.SuppressLint;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -262,6 +263,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         return c;
     }
 
+    @SuppressLint("Range")
     public ArrayList<MRUEntity> getMRU(String bookno, String userid) {
         ArrayList<MRUEntity> mruEntities = new ArrayList<>();
         mruEntities.clear();
@@ -301,6 +303,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         return mruEntities;
     }
 
+    @SuppressLint("Range")
     public ArrayList<MRUEntity> getMRU(String userid, String... strings) {
         ArrayList<MRUEntity> mruEntities = new ArrayList<>();
         mruEntities.clear();
@@ -372,6 +375,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         return c;
     }
 
+    @SuppressLint("Range")
     public ArrayList<BookNoEntity> getBookNo(String userid) {
         ArrayList<BookNoEntity> mruEntities = new ArrayList<>();
         mruEntities.clear();
@@ -432,6 +436,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         return c;
     }
 
+    @SuppressLint("Range")
     public ArrayList<Statement> getSuccessStatements(String user_id, String charSequence, boolean tog_val) {
         String query = null;
         ArrayList<Statement> statementMS = new ArrayList<>();
@@ -529,6 +534,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         return count;
     }
 
+    @SuppressLint("Range")
     public ArrayList<Statement> getTotalSynkStatements(String user_id) {
         ArrayList<Statement> statementMS = new ArrayList<>();
         statementMS.clear();
@@ -641,6 +647,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         return c;
     }
 
+    @SuppressLint("Range")
     public ArrayList<NeftEntity> getTotalNeft(String from, String to, String user_id) {
         ArrayList<NeftEntity> neftEntities = new ArrayList<>();
         neftEntities.clear();
@@ -663,6 +670,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         return neftEntities;
     }
 
+    @SuppressLint("Range")
     public ArrayList<Statement> getReport(String from, String to, String user_id) {
         ArrayList<Statement> statementMS = new ArrayList<>();
         statementMS.clear();
@@ -683,6 +691,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         return statementMS;
     }
 
+    @SuppressLint("Range")
     public Statement getTransStatus(UserInfo2 userInfo2, String con_id, String date) {
         Statement statement = null;
         String query = "select transStatus,payDate from Statement where USER_ID=? and CON_ID=? and payDate BETWEEN ? AND ?";
@@ -757,6 +766,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         return c;
     }
 
+    @SuppressLint("Range")
     public ArrayList<String> getBanks() {
         ArrayList<String> banks = new ArrayList<>();
         banks.clear();

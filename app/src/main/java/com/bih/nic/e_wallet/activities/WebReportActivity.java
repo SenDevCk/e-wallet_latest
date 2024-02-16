@@ -32,13 +32,13 @@ public class WebReportActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_web_report);
-        toolbar_web_rep = (Toolbar) findViewById(R.id.toolbar_web_rep);
+        toolbar_web_rep =  findViewById(R.id.toolbar_web_rep);
         toolbar_web_rep.setTitle("Web Report");
         setSupportActionBar(toolbar_web_rep);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         userInfo2 = CommonPref.getUserDetails(WebReportActivity.this);
-        webView = (WebView) findViewById(R.id.webview);
+        webView =  findViewById(R.id.webview);
         //setUpWebView();
     }
 
@@ -101,6 +101,7 @@ public class WebReportActivity extends AppCompatActivity {
 
     @Override
     public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         switch (requestCode) {
             case MY_PERMISSIONS_REQUEST_ACCOUNTS:
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {

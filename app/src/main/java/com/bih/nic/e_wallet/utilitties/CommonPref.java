@@ -51,7 +51,6 @@ public class CommonPref {
 		editor.putString("ACCT_NO", UserInfo2.getACCT_NO());
 		editor.commit();
 	}
-
 	public static UserInfo2 getUserDetails(Context context) {
 		String key = "_USER_DETAILS";
 		UserInfo2 UserInfo2 = new UserInfo2();

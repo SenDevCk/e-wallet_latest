@@ -1,21 +1,23 @@
 package com.bih.nic.e_wallet.SessionManager;
 
+import android.Manifest;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
+import android.content.pm.PackageManager;
 import android.util.Log;
+
+import androidx.core.app.ActivityCompat;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
-public class ClsUtils
-{
+public class ClsUtils {
     /**
      * 与设备配对 参考源码：platform/packages/apps/Settings.git
      * /Settings/src/com/android/settings/bluetooth/CachedBluetoothDevice.java
      */
     static public boolean createBond(Class btClass, BluetoothDevice btDevice)
-            throws Exception
-    {
+            throws Exception {
         Method createBondMethod = btClass.getMethod("createBond");
         Boolean returnValue = (Boolean) createBondMethod.invoke(btDevice);
         return returnValue.booleanValue();
@@ -26,18 +28,15 @@ public class ClsUtils
      * /Settings/src/com/android/settings/bluetooth/CachedBluetoothDevice.java
      */
     static public boolean removeBond(Class btClass, BluetoothDevice btDevice)
-            throws Exception
-    {
+            throws Exception {
         Method removeBondMethod = btClass.getMethod("removeBond");
         Boolean returnValue = (Boolean) removeBondMethod.invoke(btDevice);
         return returnValue.booleanValue();
     }
 
     static public boolean setPin(Class btClass, BluetoothDevice btDevice,
-                                 String str) throws Exception
-    {
-        try
-        {
+                                 String str) throws Exception {
+        try {
             Method removeBondMethod = btClass.getDeclaredMethod("setPin",
                     new Class[]
                             {byte[].class});
@@ -45,19 +44,13 @@ public class ClsUtils
                     new Object[]
                             {str.getBytes()});
             Log.e("returnValue", "" + returnValue);
-        }
-        catch (SecurityException e)
-        {
+        } catch (SecurityException e) {
             // throw new RuntimeException(e.getMessage());
             e.printStackTrace();
-        }
-        catch (IllegalArgumentException e)
-        {
+        } catch (IllegalArgumentException e) {
             // throw new RuntimeException(e.getMessage());
             e.printStackTrace();
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
@@ -68,8 +61,7 @@ public class ClsUtils
     static public boolean cancelPairingUserInput(Class btClass,
                                                  BluetoothDevice device)
 
-            throws Exception
-    {
+            throws Exception {
         Method createBondMethod = btClass.getMethod("cancelPairingUserInput");
         // cancelBondProcess()
         Boolean returnValue = (Boolean) createBondMethod.invoke(device);
@@ -80,8 +72,7 @@ public class ClsUtils
     static public boolean cancelBondProcess(Class btClass,
                                             BluetoothDevice device)
 
-            throws Exception
-    {
+            throws Exception {
         Method createBondMethod = btClass.getMethod("cancelBondProcess");
         Boolean returnValue = (Boolean) createBondMethod.invoke(device);
         return returnValue.booleanValue();
@@ -91,49 +82,48 @@ public class ClsUtils
      *
      * @param clsShow
      */
-    static public void printAllInform(Class clsShow)
-    {
-        try
-        {
+    static public void printAllInform(Class clsShow) {
+        try {
             // 取得所有方法
             Method[] hideMethod = clsShow.getMethods();
             int i = 0;
-            for (; i < hideMethod.length; i++)
-            {
+            for (; i < hideMethod.length; i++) {
                 Log.e("method name", hideMethod[i].getName() + ";and the i is:"
                         + i);
             }
             // 取得所有常量
             Field[] allFields = clsShow.getFields();
-            for (i = 0; i < allFields.length; i++)
-            {
+            for (i = 0; i < allFields.length; i++) {
                 Log.e("Field name", allFields[i].getName());
             }
-        }
-        catch (SecurityException e)
-        {
+        } catch (SecurityException e) {
             // throw new RuntimeException(e.getMessage());
             e.printStackTrace();
-        }
-        catch (IllegalArgumentException e)
-        {
+        } catch (IllegalArgumentException e) {
             // throw new RuntimeException(e.getMessage());
             e.printStackTrace();
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
     }
 
-
-    static public boolean pair(String strAddr, String strPsw)
-    {
+/*
+    static public boolean pair(String strAddr, String strPsw) {
         boolean result = false;
         BluetoothAdapter bluetoothAdapter = BluetoothAdapter
                 .getDefaultAdapter();
 
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return true;
+        }
         bluetoothAdapter.cancelDiscovery();
 
         if (!bluetoothAdapter.isEnabled())
@@ -187,5 +177,5 @@ public class ClsUtils
             }
         }
         return result;
-    }
+    }*/
 }

@@ -44,21 +44,16 @@ public class UnbilledConsumerListActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_consumer);
-        toolbar_sel_topup = (Toolbar) findViewById(R.id.toolbar_sel_topup);
+        toolbar_sel_topup =  findViewById(R.id.toolbar_sel_topup);
         toolbar_sel_topup.setTitle("Unbilled Consumer");
         setSupportActionBar(toolbar_sel_topup);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 
-        text_no_data_found = (TextView) findViewById(R.id.text_no_data_found);
-        recycler_list_consumer = (RecyclerView) findViewById(R.id.recycler_list_consumer);
-        rel_search = (RelativeLayout) findViewById(R.id.rel_search);
-        rel_search.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                setUpDialog();
-            }
-        });
+        text_no_data_found =  findViewById(R.id.text_no_data_found);
+        recycler_list_consumer =  findViewById(R.id.recycler_list_consumer);
+        rel_search =  findViewById(R.id.rel_search);
+        rel_search.setOnClickListener(v -> setUpDialog());
         mruEntities = new DataBaseHelper(UnbilledConsumerListActivity.this).getUnbuiledConsumer(CommonPref.getUserDetails(UnbilledConsumerListActivity.this).getUserID(), new String[]{});
         updateList();
     }
@@ -169,26 +164,23 @@ public class UnbilledConsumerListActivity extends AppCompatActivity {
             }
         });
         Button search_for_mru = (Button) setup_dialog.findViewById(R.id.search_for_mru);
-        search_for_mru.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // Close dialog
-                UserInfo2 userInfo2 = CommonPref.getUserDetails(UnbilledConsumerListActivity.this);
-                if (edit_con_id.getText().toString().trim().length() > 0) {
-                    setup_dialog.dismiss();
-                    mruEntities=new DataBaseHelper(UnbilledConsumerListActivity.this).getUnbuiledConsumer(userInfo2.getUserID(), new String[]{edit_con_id.getText().toString().trim(), "conid"});
-                    updateList();
-                } else if (edit_acount_no.getText().toString().trim().length() > 0) {
-                    setup_dialog.dismiss();
-                    mruEntities=new DataBaseHelper(UnbilledConsumerListActivity.this).getUnbuiledConsumer(userInfo2.getUserID(), new String[]{edit_acount_no.getText().toString().trim(), "ac"});
-                    updateList();
-                } else if (edit_book_no.getText().toString().trim().length() > 0) {
-                    setup_dialog.dismiss();
-                    mruEntities=new DataBaseHelper(UnbilledConsumerListActivity.this).getUnbuiledConsumer(userInfo2.getUserID(), new String[]{edit_book_no.getText().toString().trim(), "book"});
-                    updateList();
-                } else {
-                    Toast.makeText(UnbilledConsumerListActivity.this, "Please Enter Cons Id or Account No or Book No", Toast.LENGTH_SHORT).show();
-                }
+        search_for_mru.setOnClickListener(v -> {
+            // Close dialog
+            UserInfo2 userInfo2 = CommonPref.getUserDetails(UnbilledConsumerListActivity.this);
+            if (edit_con_id.getText().toString().trim().length() > 0) {
+                setup_dialog.dismiss();
+                mruEntities=new DataBaseHelper(UnbilledConsumerListActivity.this).getUnbuiledConsumer(userInfo2.getUserID(), new String[]{edit_con_id.getText().toString().trim(), "conid"});
+                updateList();
+            } else if (edit_acount_no.getText().toString().trim().length() > 0) {
+                setup_dialog.dismiss();
+                mruEntities=new DataBaseHelper(UnbilledConsumerListActivity.this).getUnbuiledConsumer(userInfo2.getUserID(), new String[]{edit_acount_no.getText().toString().trim(), "ac"});
+                updateList();
+            } else if (edit_book_no.getText().toString().trim().length() > 0) {
+                setup_dialog.dismiss();
+                mruEntities=new DataBaseHelper(UnbilledConsumerListActivity.this).getUnbuiledConsumer(userInfo2.getUserID(), new String[]{edit_book_no.getText().toString().trim(), "book"});
+                updateList();
+            } else {
+                Toast.makeText(UnbilledConsumerListActivity.this, "Please Enter Cons Id or Account No or Book No", Toast.LENGTH_SHORT).show();
             }
         });
         setup_dialog.show();

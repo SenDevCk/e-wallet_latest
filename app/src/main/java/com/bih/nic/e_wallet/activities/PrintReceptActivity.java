@@ -1,9 +1,12 @@
 package com.bih.nic.e_wallet.activities;
+
 import android.Manifest;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
+import android.content.ContentResolver;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -11,6 +14,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
@@ -43,7 +47,6 @@ import com.bih.nic.e_wallet.entity.UserInfo2;
 import com.bih.nic.e_wallet.utilitties.CommonPref;
 import com.bih.nic.e_wallet.utilitties.ShowMsg;
 import com.bih.nic.e_wallet.utilitties.Utiilties;
-import com.bxl.config.editor.BXLConfigLoader;
 import com.epson.epos2.Epos2Exception;
 import com.epson.epos2.printer.Printer;
 import com.epson.epos2.printer.PrinterStatusInfo;
@@ -58,16 +61,19 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import HPRTAndroidSDK.HPRTPrinterHelper;
 import jpos.JposConst;
 import jpos.POSPrinterConst;
-public class PrintReceptActivity extends AppCompatActivity implements ReceiveListener,View.OnClickListener {
+
+public class PrintReceptActivity extends AppCompatActivity implements ReceiveListener, View.OnClickListener {
     Toolbar toolbar_print_recept;
     Statement bill;
-    Bitmap  bmp_print;
+    Bitmap bmp_print;
     DecimalFormat df = new DecimalFormat("0.00");
     private Printer mPrinter = null;
     private Context mContext = null;
@@ -89,13 +95,13 @@ public class PrintReceptActivity extends AppCompatActivity implements ReceiveLis
     private static final int REQUEST_ENABLE_BT = 99;
     private static final int REQUEST_ENABLE_BT1 = 100;
     final protected static char[] hexArray = "0123456789ABCDEF".toCharArray();
-    private BXLConfigLoader bxlConfigLoader;
     Button button_print;
     TextView text_consumer_name, text_consumer_ac, text_con_id_pr, text_bill_no_pr, text_contact, text_walet_bal, text_pay_amount, text_recept_no2, text_amount, text_name_pr;
     LinearLayout ll1, ll2;
     private final int BLUETOOTH_PERMISSION_CODE = 23;
     int printid1 = 0;
     private static final int MY_PERMISSIONS_REQUEST_ACCOUNTS = 1;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -107,7 +113,7 @@ public class PrintReceptActivity extends AppCompatActivity implements ReceiveLis
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         ll1 = (LinearLayout) findViewById(R.id.ll1);
         ll2 = (LinearLayout) findViewById(R.id.ll2);
-        mContext=this;
+        mContext = this;
   /*      if (CommonPref.getPrinterType(PrintReceptActivity.this).equalsIgnoreCase("T")) {
             session = new SharedPrefClass(PrintReceptActivity.this);
             btAdapt = BluetoothAdapter.getDefaultAdapter();
@@ -137,6 +143,14 @@ public class PrintReceptActivity extends AppCompatActivity implements ReceiveLis
                     bill.setRRFContactNo(cursor.getString(cursor.getColumnIndex("RRFContactNo")));
                     bill.setConsumerContactNo(cursor.getString(cursor.getColumnIndex("ConsumerContactNo")));
                     bill.setMESSAGE_STRING(cursor.getString(cursor.getColumnIndex("MESSAGE_STRING")));
+         /*           Long date=cursor.getLong(cursor.getColumnIndex("payDate"));
+                    if(date.toString().contains("01/01/1970")){
+                        SimpleDateFormat df=new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+                        Date d=new Date();
+                        bill.setPayDate(Long.parseLong(df.format(d)));
+                    }else {
+                        bill.setPayDate(date);
+                    }*/
                     bill.setPayDate(cursor.getLong(cursor.getColumnIndex("payDate")));
                     bill.setBILL_NO(cursor.getString(cursor.getColumnIndex("BILL_NO")));
                     bill.setPayMode(cursor.getString(cursor.getColumnIndex("payMode")));
@@ -174,8 +188,6 @@ public class PrintReceptActivity extends AppCompatActivity implements ReceiveLis
     }
 
 
-
-
     private void initUI1() {
         ImageView logo_pr = (ImageView) findViewById(R.id.logo_pr);
         if ((bill.getRCPT_NO().toString().trim().charAt(4)) == '2') {
@@ -210,7 +222,7 @@ public class PrintReceptActivity extends AppCompatActivity implements ReceiveLis
 
     @Override
     public boolean onSupportNavigateUp() {
-      //  closePrinter();
+        //  closePrinter();
         onBackPressed();
         return true;
     }
@@ -220,10 +232,10 @@ public class PrintReceptActivity extends AppCompatActivity implements ReceiveLis
             return false;
         }
 
-            if (!createReceiptDataOffline()) {
-                finalizeObject();
-                return false;
-            }
+        if (!createReceiptDataOffline()) {
+            finalizeObject();
+            return false;
+        }
 
 
         if (!printData()) {
@@ -270,7 +282,6 @@ public class PrintReceptActivity extends AppCompatActivity implements ReceiveLis
             }
         });
     }
-
     private String makeErrorMessage(PrinterStatusInfo status) {
         String msg = "";
 
@@ -561,6 +572,12 @@ public class PrintReceptActivity extends AppCompatActivity implements ReceiveLis
                 Toast.makeText(mContext, "Bluetooth about to start.",
                         Toast.LENGTH_SHORT).show();
                 Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+                if (ContextCompat.checkSelfPermission(PrintReceptActivity.this, Manifest.permission.BLUETOOTH_CONNECT) == PackageManager.PERMISSION_DENIED) {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                        ActivityCompat.requestPermissions(PrintReceptActivity.this, new String[]{Manifest.permission.BLUETOOTH_CONNECT}, 2);
+                        return;
+                    }
+                }
                 startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
             } else {
 
@@ -593,8 +610,8 @@ public class PrintReceptActivity extends AppCompatActivity implements ReceiveLis
                             Intent intent = new Intent(PrintReceptActivity.this, AnalogicsPrinterSetupActivity.class);
                             startActivity(intent);
                         }
-                    }else if(CommonPref.getPrinterType(getApplicationContext()).equals("T")) {
-                               openfortvs(true);
+                    } else if (CommonPref.getPrinterType(getApplicationContext()).equals("T")) {
+                        openfortvs(true);
                     }
                 } else {
                     Toast.makeText(PrintReceptActivity.this,
@@ -620,6 +637,12 @@ public class PrintReceptActivity extends AppCompatActivity implements ReceiveLis
 
         } else {
             if (bluetoothAdapter.isEnabled()) {
+                if (ContextCompat.checkSelfPermission(PrintReceptActivity.this, Manifest.permission.BLUETOOTH_CONNECT) == PackageManager.PERMISSION_DENIED) {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                        ActivityCompat.requestPermissions(PrintReceptActivity.this, new String[]{Manifest.permission.BLUETOOTH_CONNECT}, 2);
+                        return;
+                    }
+                }
                 if (bluetoothAdapter.isDiscovering()) {
                     Toast.makeText(
                             getBaseContext(),
@@ -853,6 +876,7 @@ public class PrintReceptActivity extends AppCompatActivity implements ReceiveLis
 
         return true;
     }
+
     private void createReceiptDataOffline_tvs(HPRTPrinterHelper hprtPrinterHelper) {
         UserInfo2 userinfo = CommonPref.getUserDetails(PrintReceptActivity.this);
         String method = "";
@@ -870,20 +894,20 @@ public class PrintReceptActivity extends AppCompatActivity implements ReceiveLis
                 header = "       NBPDCL\n";
                 website = "https://www.nbpdcl.co.in";
                 logoData = BitmapFactory.decodeResource(getResources(), R.drawable.nblogo);
-               // logoData=Bitmap.createScaledBitmap(logoData,350,220,true);
+                // logoData=Bitmap.createScaledBitmap(logoData,350,220,true);
             } else
                 header = "    Transaction failure\n";
 
-         //   Thread.sleep(50);
-            printimage(Bitmap.createScaledBitmap(logoData,350,220,true));
-          //  Thread.sleep(50);
+            //   Thread.sleep(50);
+            printimage(Bitmap.createScaledBitmap(logoData, 350, 220, true));
+            //  Thread.sleep(50);
             hprtPrinterHelper.WriteData(new byte[]{0x1D, 0x21, 0x00});
-            hprtPrinterHelper.WriteData(("        Payment Receipt"  + "\n").getBytes("gb2312"));
+            hprtPrinterHelper.WriteData(("        Payment Receipt" + "\n").getBytes("gb2312"));
             hprtPrinterHelper.WriteData(new byte[]{0x1d, 0x0c});
 
-            hprtPrinterHelper.WriteData(("       " +header + "\n").getBytes("gb2312"));
+            hprtPrinterHelper.WriteData(("       " + header + "\n").getBytes("gb2312"));
             hprtPrinterHelper.WriteData(new byte[]{0x1d, 0x0c});
-        //    Thread.sleep(50);
+            //    Thread.sleep(50);
             textData.append("PAY DATE  : " + Utiilties.convertTimestampToStringSlash(bill.getPayDate()).trim().substring(0, 19) + "\n");
             textData.append("RECEIPT NO: " + bill.getRCPT_NO().trim() + "\n");
             //textData.append("A/C NUMBER   : " + bill.getWALLET_ID().trim() + "\n");
@@ -906,8 +930,8 @@ public class PrintReceptActivity extends AppCompatActivity implements ReceiveLis
             textData.delete(0, textData.length());
             hprtPrinterHelper.WriteData(("" + "\n").getBytes("gb2312"));
             hprtPrinterHelper.WriteData(new byte[]{0x1d, 0x0c});
-          //  method = "addCut";
-           // mPrinter.addCut(Printer.CUT_FEED);
+            //  method = "addCut";
+            // mPrinter.addCut(Printer.CUT_FEED);
             long c1 = new DataBaseHelper(PrintReceptActivity.this).updateStatementDetailsIsPrinted(bill.getTRANS_ID());
             if (c1 == 1) {
                 Toast.makeText(PrintReceptActivity.this, "Update database", Toast.LENGTH_LONG).show();
@@ -925,7 +949,6 @@ public class PrintReceptActivity extends AppCompatActivity implements ReceiveLis
         textData = null;
 
     }
-
 
 
     private static String getERMessage(int status) {
@@ -1106,21 +1129,21 @@ public class PrintReceptActivity extends AppCompatActivity implements ReceiveLis
 
     @Override
     protected void onDestroy() {
-    //    closePrinter();
+        //    closePrinter();
         super.onDestroy();
     }
 
     @Override
     public void onClick(View v) {
-      //  if (isReadStorageAllowed()) {
-            //If permission is already having then showing the toast
-            bluetooth();
-            return;
-       // } else {
+        //  if (isReadStorageAllowed()) {
+        //If permission is already having then showing the toast
+        bluetooth();
+        return;
+        // } else {
 
-            //If the app has not the permission then asking for the permission
+        //If the app has not the permission then asking for the permission
         //    requestBluetoothPermission();
-    //    }
+        //    }
     }
 
     //We are calling this method to check the permission status
@@ -1172,39 +1195,31 @@ public class PrintReceptActivity extends AppCompatActivity implements ReceiveLis
 
         Button Cancel = (Button) dialog.findViewById(R.id.btn_cancel);
         // if button is clicked, close the custom dialog
-        Cancel.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                dialog.dismiss();
-            }
-        });
+        Cancel.setOnClickListener(v -> dialog.dismiss());
         Button Ok = (Button) dialog.findViewById(R.id.btn_OK);
         // if button is clicked, close the custom dialog
-        Ok.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (epson.isChecked() && Analogics.isChecked()) {
+        Ok.setOnClickListener(v -> {
+            if (epson.isChecked() && Analogics.isChecked()) {
 
-                    Toast.makeText(getBaseContext(), "Please Select One Printer", Toast.LENGTH_SHORT).show();
-                } else if (epson.isChecked()) {
-                    //  Toast.makeText(getBaseContext(), "Epson", Toast.LENGTH_SHORT).show();
-                    CommonPref.setPrinterType(PrintReceptActivity.this, "E");
-                    dialog.dismiss();
-                    bluetooth(1);
-                } else if (Analogics.isChecked()) {
-                    //  Toast.makeText(getBaseContext(), "Analogics", Toast.LENGTH_SHORT).show();
-                    Intent intent = new Intent(PrintReceptActivity.this,
-                            AnalogicsPrinterSetupActivity.class);
-                    startActivity(intent);
-                    dialog.dismiss();
-                    //bluetooth(2);
-                } else if (Tvs.isChecked()) {
-                    //  Toast.makeText(getBaseContext(), "Analogics", Toast.LENGTH_SHORT).show();
-                    dialog.dismiss();
-                    bluetooth(2);
-                }
-
+                Toast.makeText(getBaseContext(), "Please Select One Printer", Toast.LENGTH_SHORT).show();
+            } else if (epson.isChecked()) {
+                //  Toast.makeText(getBaseContext(), "Epson", Toast.LENGTH_SHORT).show();
+                CommonPref.setPrinterType(PrintReceptActivity.this, "E");
+                dialog.dismiss();
+                bluetooth(1);
+            } else if (Analogics.isChecked()) {
+                //  Toast.makeText(getBaseContext(), "Analogics", Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(PrintReceptActivity.this,
+                        AnalogicsPrinterSetupActivity.class);
+                startActivity(intent);
+                dialog.dismiss();
+                //bluetooth(2);
+            } else if (Tvs.isChecked()) {
+                //  Toast.makeText(getBaseContext(), "Analogics", Toast.LENGTH_SHORT).show();
+                dialog.dismiss();
+                bluetooth(2);
             }
+
         });
 
         dialog.show();
@@ -1222,6 +1237,12 @@ public class PrintReceptActivity extends AppCompatActivity implements ReceiveLis
             if (!mBluetoothAdapter.isEnabled()) {
                 Toast.makeText(PrintReceptActivity.this, "Bluetooth about to start.", Toast.LENGTH_SHORT).show();
                 Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+                if (ContextCompat.checkSelfPermission(PrintReceptActivity.this, Manifest.permission.BLUETOOTH_CONNECT) == PackageManager.PERMISSION_DENIED) {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                        ActivityCompat.requestPermissions(PrintReceptActivity.this, new String[]{Manifest.permission.BLUETOOTH_CONNECT}, 2);
+                        return;
+                    }
+                }
                 startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
             } else {
                 if (printid == 1) {
@@ -1242,7 +1263,7 @@ public class PrintReceptActivity extends AppCompatActivity implements ReceiveLis
 
                 } else if (printid == 2) {
                     printid1 = 2;
-                       openfortvs(true);
+                    openfortvs(true);
 
                 }
 
@@ -1349,11 +1370,17 @@ public class PrintReceptActivity extends AppCompatActivity implements ReceiveLis
             Intent intent = new Intent(PrintReceptActivity.this,
                     Activity_DeviceList.class);
             startActivity(intent);
-        //    CommonPref.setPrinterType(PrintReceptActivity.this, "T");
+            //    CommonPref.setPrinterType(PrintReceptActivity.this, "T");
         }
     }
 
     public void Conneting() {
+        if (ContextCompat.checkSelfPermission(PrintReceptActivity.this, Manifest.permission.BLUETOOTH_CONNECT) == PackageManager.PERMISSION_DENIED) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                ActivityCompat.requestPermissions(PrintReceptActivity.this, new String[]{Manifest.permission.BLUETOOTH_CONNECT}, 2);
+                return;
+            }
+        }
         if (btAdapt.isDiscovering())
             btAdapt.cancelDiscovery();
         BluetoothDevice btDev = btAdapt.getRemoteDevice(session.getKeyMac());
@@ -1361,21 +1388,17 @@ public class PrintReceptActivity extends AppCompatActivity implements ReceiveLis
             btDev_str = btDev.toString();
             toothAddress = btDev_str;
             pd = ProgressDialog.show(PrintReceptActivity.this, "Please Wait", "Connecting");
-            thread = new Thread(new Runnable() {
-
-                @Override
-                public void run() {
-                    // TODO Auto-generated method stub
-                    try {
-                        int portOpen = HPRTPrinterHelper.PortOpen("Bluetooth," + btDev_str);
-                        message = new Message();
-                        message.what = portOpen;
-                        handler_bt.sendMessage(message);
+            thread = new Thread(() -> {
+                // TODO Auto-generated method stub
+                try {
+                    int portOpen = HPRTPrinterHelper.PortOpen("Bluetooth," + btDev_str);
+                    message = new Message();
+                    message.what = portOpen;
+                    handler_bt.sendMessage(message);
 //                            Log.e("", "msg:"+portOpen);
-                    } catch (Exception e) {
-                        // TODO Auto-generated catch block
-                        e.printStackTrace();
-                    }
+                } catch (Exception e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
                 }
             });
             thread.start();
@@ -1488,4 +1511,21 @@ public class PrintReceptActivity extends AppCompatActivity implements ReceiveLis
             Toast.makeText(mContext, "please setup printer first", Toast.LENGTH_SHORT).show();
         }
     }
+ /*   public void senddata(MRUDetails mru) {
+        UserInfo2 user=CommonPref.getUserDetails(PinCodeActivity.this);
+        Uri uri = Uri.parse("content://com.datainfosys.bpdcl.provider/Log");
+        String data=user.getUserID()+","+user.getSubDiv()+",PAYMENT,"+bill.get_CON_ID()+","+user.get_MRUNo()+","+mru.get_Latitude()+","+mru.get_Longitude()+","+bill.get_READ_DATE()+","+bill.get_READ_STAT()+","+bill.get_CUR_READ();
+        ContentValues values = new ContentValues();
+        try {
+            values.put("id", 0);
+            values.put("data",data);
+            values.put("uploaded", 0);
+            ContentResolver contentResolver = getContentResolver();
+            Uri newuri = contentResolver.insert(uri, values);
+            Log.e("data sent",""+data);
+            android.util.Log.d("NewActivity", "getDataFromIntent: "+newuri);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }*/
 }

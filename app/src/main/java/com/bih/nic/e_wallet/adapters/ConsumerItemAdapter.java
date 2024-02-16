@@ -33,12 +33,12 @@ public class ConsumerItemAdapter extends RecyclerView.Adapter<ConsumerItemAdapte
         ImageView go_to_statement_view;
         public MyViewHolder(View view) {
             super(view);
-            go_to_statement_view = (ImageView) view.findViewById(R.id.go_to_statement_view);
-            text_con_nmae = (TextView) view.findViewById(R.id.text_con_nmae);
-            text_ac_no = (TextView) view.findViewById(R.id.text_ac_no);
-            text_con_id = (TextView) view.findViewById(R.id.text_con_id);
-            text_book_nocl = (TextView) view.findViewById(R.id.text_book_nocl);
-            //description = (TextView) view.findViewById(R.id.text_description);
+            go_to_statement_view =  view.findViewById(R.id.go_to_statement_view);
+            text_con_nmae =  view.findViewById(R.id.text_con_nmae);
+            text_ac_no =  view.findViewById(R.id.text_ac_no);
+            text_con_id =  view.findViewById(R.id.text_con_id);
+            text_book_nocl =  view.findViewById(R.id.text_book_nocl);
+            //description =  view.findViewById(R.id.text_description);
         }
     }
 
@@ -65,14 +65,11 @@ public class ConsumerItemAdapter extends RecyclerView.Adapter<ConsumerItemAdapte
         holder.text_ac_no.setText(mruEntity.getACT_NO());
         holder.text_con_id.setText(mruEntity.getCON_ID());
         holder.text_book_nocl.setText(mruEntity.getBOOK_NO());
-        holder.go_to_statement_view.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent=new Intent(activity, PayDetailsActivity.class);
-                intent.putExtra("flag","billed");
-                intent.putExtra("object",mruEntity);
-                activity.startActivity(intent);
-            }
+        holder.go_to_statement_view.setOnClickListener(v -> {
+            Intent intent=new Intent(activity, PayDetailsActivity.class);
+            intent.putExtra("flag","billed");
+            intent.putExtra("object",mruEntity);
+            activity.startActivity(intent);
         });
         //holder.title.setText(homeitemEntities.get(position).getTitle());
         //holder.description.setText(homeitemEntities.get(position).getDescription());

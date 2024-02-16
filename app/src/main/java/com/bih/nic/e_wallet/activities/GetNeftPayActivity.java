@@ -22,12 +22,12 @@ NeftItemAdapter neftItemAdapter;
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_get_neft_pay);
-        toolbar_getneft=(Toolbar)findViewById(R.id.toolbar_getneft);
+        toolbar_getneft=findViewById(R.id.toolbar_getneft);
         toolbar_getneft.setTitle("NEFT PAY");
         setSupportActionBar(toolbar_getneft);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
-        recycler_list_neft=(RecyclerView)findViewById(R.id.recycler_list_neft);
+        recycler_list_neft=findViewById(R.id.recycler_list_neft);
         if (CommonPref.neftEntities.size() > 0) {
             //text_no_data_found.setVisibility(View.GONE);
             neftItemAdapter = new NeftItemAdapter(CommonPref.neftEntities, GetNeftPayActivity.this);
@@ -40,7 +40,6 @@ NeftItemAdapter neftItemAdapter;
             recycler_list_neft.setVisibility(View.GONE);
         }
     }
-
     @Override
     public boolean onSupportNavigateUp() {
         onBackPressed();

@@ -47,16 +47,16 @@ public class GrivanceListAdapter extends BaseAdapter {
     @Override
     public View getView(final int position, View convertView, ViewGroup parent) {
         convertView=layoutInflater.inflate(R.layout.neft_item, null, false);
-        LinearLayout ll_walet=(LinearLayout)convertView.findViewById(R.id.ll_walet);
-        LinearLayout ll_tn=(LinearLayout)convertView.findViewById(R.id.ll_tn);
+        LinearLayout ll_walet=convertView.findViewById(R.id.ll_walet);
+        LinearLayout ll_tn=convertView.findViewById(R.id.ll_tn);
         ll_tn.setVisibility(View.VISIBLE);
-        TextView text_wal_id=(TextView)convertView.findViewById(R.id.text_wal_id);
+        TextView text_wal_id=convertView.findViewById(R.id.text_wal_id);
         text_wal_id.setText("Bank Name");
-        TextView text_wid=(TextView)convertView.findViewById(R.id.text_wid);
-        TextView text_utr=(TextView)convertView.findViewById(R.id.text_utr);
-        TextView text_time=(TextView)convertView.findViewById(R.id.text_time);
-        TextView text_ticket_no=(TextView)convertView.findViewById(R.id.text_ticket_no);
-        TextView text_amount_paid=(TextView)convertView.findViewById(R.id.text_amount_paid);
+        TextView text_wid=convertView.findViewById(R.id.text_wid);
+        TextView text_utr=convertView.findViewById(R.id.text_utr);
+        TextView text_time=convertView.findViewById(R.id.text_time);
+        TextView text_ticket_no=convertView.findViewById(R.id.text_ticket_no);
+        TextView text_amount_paid=convertView.findViewById(R.id.text_amount_paid);
         final GrivanceEntity grivanceEntity=reportEntities.get(position);
         text_wid.setText(grivanceEntity.getBANK());
         text_utr.setText(grivanceEntity.getUTR_NO());
@@ -68,12 +68,7 @@ public class GrivanceListAdapter extends BaseAdapter {
         }else{
             ll_walet.setBackgroundColor(activity.getResources().getColor(R.color.holo_green_light));
         }
-        convertView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                setUpDialog(grivanceEntity);
-            }
-        });
+        convertView.setOnClickListener(v -> setUpDialog(grivanceEntity));
         return convertView;
     }
 
@@ -97,12 +92,7 @@ public class GrivanceListAdapter extends BaseAdapter {
         ((TextView)setup_dialog.findViewById(R.id.text_stas)).setText(""+grivanceEntity.getSTATUS());
         ((TextView)setup_dialog.findViewById(R.id.text_cu_sts)).setText(""+grivanceEntity.getCURRENT_STATUS());
         ((TextView)setup_dialog.findViewById(R.id.text_ms_st)).setText(""+grivanceEntity.getMSG_STR());
-        ((ImageView)setup_dialog.findViewById(R.id.close_setup)).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                setup_dialog.dismiss();
-            }
-        });
+        ((ImageView)setup_dialog.findViewById(R.id.close_setup)).setOnClickListener(v -> setup_dialog.dismiss());
         setup_dialog.show();
     }
 }

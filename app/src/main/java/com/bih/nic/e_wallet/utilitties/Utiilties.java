@@ -93,6 +93,29 @@ public class Utiilties {
         alertDialog.show();
     }
 
+    public static boolean isEmulator() {
+        return (Build.BRAND.startsWith("generic") && Build.DEVICE.startsWith("generic"))
+                || Build.FINGERPRINT.startsWith("generic")
+                || Build.FINGERPRINT.startsWith("unknown")
+                || Build.HARDWARE.contains("goldfish")
+                || Build.HARDWARE.contains("ranchu")
+                || Build.MODEL.contains("google_sdk")
+                || Build.MODEL.contains("Emulator")
+                || Build.MODEL.contains("Android SDK built for x86")
+                || Build.MODEL.contains("sdk_gphone_x86_64")
+                || Build.MANUFACTURER.contains("Genymotion")
+                || Build.MANUFACTURER.contains("genymotion")
+                || Build.MANUFACTURER.contains("Google")
+                || Build.MANUFACTURER.contains("google")
+                || Build.PRODUCT.contains("sdk_google")
+                || Build.PRODUCT.contains("google_sdk")
+                || Build.PRODUCT.contains("sdk")
+                || Build.PRODUCT.contains("sdk_x86")
+                || Build.PRODUCT.contains("sdk_gphone64_arm64")
+                || Build.PRODUCT.contains("vbox86p")
+                || Build.PRODUCT.contains("emulator")
+                || Build.PRODUCT.contains("simulator");
+    }
 
     //check online
     public static boolean isOnline(Context context) {
@@ -653,11 +676,9 @@ public class Utiilties {
     public static String getCurrentDateWithTime() {
         Calendar c = Calendar.getInstance();
         System.out.println("Current time => " + c.getTime());
-
         SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
         String formattedDate = df.format(c.getTime());
         return formattedDate.trim();
-
     }
 
     public static long getNoOfMinutes(long date1, long date2) {
@@ -694,6 +715,7 @@ public class Utiilties {
         }
     }
 
+    @SuppressLint("Range")
     public static String getIMEI_forAndroid10(Activity activity) {
         Cursor cursor_bill,cursor_ewallet;
         String imei_ret=null,imei_bill=null;

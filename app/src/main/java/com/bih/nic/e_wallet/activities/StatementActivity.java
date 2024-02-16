@@ -40,8 +40,8 @@ public class StatementActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 
-        transaction_history_list=(ListView)findViewById(R.id.transaction_history_list);
-        text_warning_statement=(TextView) findViewById(R.id.text_warning_statement);
+        transaction_history_list=findViewById(R.id.transaction_history_list);
+        text_warning_statement= findViewById(R.id.text_warning_statement);
         statementMS = new DataBaseHelper(StatementActivity.this).getSuccessStatements(CommonPref.getUserDetails(StatementActivity.this).getUserID(),"",toggle_val);
         if (statementMS.size()>0) {
             text_warning_statement.setVisibility(View.GONE);
@@ -51,8 +51,8 @@ public class StatementActivity extends AppCompatActivity {
             text_warning_statement.setVisibility(View.VISIBLE);
             transaction_history_list.setVisibility(View.GONE);
         }
-        toggle=(ToggleButton) findViewById(R.id.toggle_re);
-        edit_rec=(EditText) findViewById(R.id.edit_rec);
+        toggle= findViewById(R.id.toggle_re);
+        edit_rec= findViewById(R.id.edit_rec);
         toggle.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {

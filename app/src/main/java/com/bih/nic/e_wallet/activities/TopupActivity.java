@@ -43,7 +43,7 @@ public class TopupActivity extends AppCompatActivity {
         super.onResume();
         if (Build.VERSION.SDK_INT < 24) {
             //Do not need to check the permission
-            webView = (WebView) findViewById(R.id.webview);
+            webView =  findViewById(R.id.webview);
             WebSettings webSettings = webView.getSettings();
             webSettings.setJavaScriptEnabled(true);
             /* WebViewClientImpl webViewClient = new WebViewClientImpl(this);
@@ -58,7 +58,7 @@ public class TopupActivity extends AppCompatActivity {
             }
         } else {
             if (checkAndRequestPermissions()) {
-                webView = (WebView) findViewById(R.id.webview);
+                webView =  findViewById(R.id.webview);
                 WebSettings webSettings = webView.getSettings();
                 webSettings.setJavaScriptEnabled(true);
                 UserInfo2 userinfo = CommonPref.getUserDetails(TopupActivity.this);
@@ -100,10 +100,11 @@ public class TopupActivity extends AppCompatActivity {
 
     @Override
     public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         switch (requestCode) {
             case MY_PERMISSIONS_REQUEST_ACCOUNTS:
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    webView = (WebView) findViewById(R.id.webview);
+                    webView =  findViewById(R.id.webview);
                     WebSettings webSettings = webView.getSettings();
                     webSettings.setJavaScriptEnabled(true);
                     UserInfo2 userinfo = CommonPref.getUserDetails(TopupActivity.this);

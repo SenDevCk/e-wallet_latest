@@ -1,6 +1,4 @@
 package com.bih.nic.e_wallet.webservices;
-
-
 import com.bih.nic.e_wallet.entity.BookNoEntity;
 import com.bih.nic.e_wallet.entity.GrivanceEntity;
 import com.bih.nic.e_wallet.entity.MRUEntity;
@@ -10,15 +8,10 @@ import com.bih.nic.e_wallet.entity.Statement;
 import com.bih.nic.e_wallet.entity.UserInfo2;
 import com.bih.nic.e_wallet.entity.Versioninfo;
 import com.bih.nic.e_wallet.utilitties.Utiilties;
-
 import org.json.JSONArray;
 import org.json.JSONObject;
-
 import java.util.ArrayList;
-
-
 public class WebServiceHelper {
-
     public static Versioninfo CheckVersion(String res) {
         Versioninfo versioninfo = null;
         try {
@@ -177,7 +170,6 @@ public class WebServiceHelper {
 
     public static ArrayList<GrivanceEntity> GrievanceParser(String res) {
         ArrayList<GrivanceEntity> statementMS = new ArrayList<>();
-
         try {
             statementMS.clear();
             JSONArray jsonArray = new JSONArray(res);
@@ -224,7 +216,6 @@ public class WebServiceHelper {
 
     public static ArrayList<NeftEntity> getNeft(String res) {
         ArrayList<NeftEntity> neftEntities = new ArrayList<NeftEntity>();
-
         try {
             neftEntities.clear();
             JSONArray jsonArray = new JSONArray(res);
@@ -309,5 +300,4 @@ public class WebServiceHelper {
         }
         return mruEntities;
     }
-
 }

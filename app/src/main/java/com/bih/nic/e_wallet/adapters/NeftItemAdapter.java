@@ -34,11 +34,11 @@ public class NeftItemAdapter extends RecyclerView.Adapter<NeftItemAdapter.MyView
         public MyViewHolder(View view) {
             super(view);
             //go_to_statement_view = (ImageView) view.findViewById(R.id.go_to_statement_view);
-            text_wid = (TextView) view.findViewById(R.id.text_wid);
-            text_amount_paid = (TextView) view.findViewById(R.id.text_amount_paid);
-            text_utr = (TextView) view.findViewById(R.id.text_utr);
-            text_time = (TextView) view.findViewById(R.id.text_time);
-            //description = (TextView) view.findViewById(R.id.text_description);
+            text_wid =  view.findViewById(R.id.text_wid);
+            text_amount_paid =  view.findViewById(R.id.text_amount_paid);
+            text_utr =  view.findViewById(R.id.text_utr);
+            text_time =  view.findViewById(R.id.text_time);
+            //description =  view.findViewById(R.id.text_description);
         }
     }
 

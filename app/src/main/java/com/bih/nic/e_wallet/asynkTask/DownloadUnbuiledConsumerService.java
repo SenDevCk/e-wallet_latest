@@ -42,8 +42,8 @@ public class DownloadUnbuiledConsumerService extends AsyncTask<String,Void,Array
         this.activity=activity;
         dialog1=new ProgressDialog(activity);
         alertDialog = new AlertDialog.Builder(this.activity).create();
-        text_no_data_found=(TextView) this.activity.findViewById(R.id.text_no_data_found);
-        recycler_list_consumer=(RecyclerView)this.activity.findViewById(R.id.recycler_list_consumer);
+        text_no_data_found= this.activity.findViewById(R.id.text_no_data_found);
+        recycler_list_consumer=this.activity.findViewById(R.id.recycler_list_consumer);
     }
     @Override
     protected void onPreExecute() {

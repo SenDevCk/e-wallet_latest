@@ -79,24 +79,21 @@ public class BookNoAdapter extends BaseAdapter {
         } else {
             ViewHolder viewHolder=new ViewHolder();
             convertView = layoutInflater.inflate(R.layout.book_no_item, null, false);
-            viewHolder.text_book_no=(TextView) convertView.findViewById(R.id.text_book_no);
-            viewHolder.text_message_string=(TextView) convertView.findViewById(R.id.text_message_string);
+            viewHolder.text_book_no= convertView.findViewById(R.id.text_book_no);
+            viewHolder.text_message_string= convertView.findViewById(R.id.text_message_string);
 
             viewHolder.text_book_no.setText(bookNoEntities.get(position-1).getBookNo());
             viewHolder.text_message_string.setText(bookNoEntities.get(position-1).getMessageString());
             if (!bookNoEntities.get(position-1).getMessageString().equals("success"))
                 viewHolder.text_message_string.setTextColor(activity.getResources().getColor(R.color.colorAccent));
-            viewHolder.text_view=(TextView) convertView.findViewById(R.id.text_view);
-            viewHolder.text_view.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    bookno=bookNoEntities.get(position-1).getBookNo();
-                    UserInfo2 userInfo2= CommonPref.getUserDetails(activity);
-                    if (flag) {
-                        new MRULoader().execute(userInfo2.getUserID() + "|" + userInfo2.getPassword() + "|" + userInfo2.getImeiNo() + "|" + userInfo2.getSerialNo() + "|" + bookno + "|NA|NA");
-                    }else{
-                        new DownloadUnbuiledConsumerService(activity).execute(userInfo2.getUserID() + "|" + userInfo2.getPassword() + "|" + userInfo2.getImeiNo() + "|" + bookno);
-                    }
+            viewHolder.text_view= convertView.findViewById(R.id.text_view);
+            viewHolder.text_view.setOnClickListener(v -> {
+                bookno=bookNoEntities.get(position-1).getBookNo();
+                UserInfo2 userInfo2= CommonPref.getUserDetails(activity);
+                if (flag) {
+                    new MRULoader().execute(userInfo2.getUserID() + "|" + userInfo2.getPassword() + "|" + userInfo2.getImeiNo() + "|" + userInfo2.getSerialNo() + "|" + bookno + "|NA|NA");
+                }else{
+                    new DownloadUnbuiledConsumerService(activity).execute(userInfo2.getUserID() + "|" + userInfo2.getPassword() + "|" + userInfo2.getImeiNo() + "|" + bookno);
                 }
             });
         }
@@ -157,11 +154,7 @@ public class BookNoAdapter extends BaseAdapter {
                 if (this.dialog1.isShowing()) this.dialog1.cancel();
                 alertDialog.setTitle("MRU Downloaded");
                 alertDialog.setMessage(" MRU not Downloaded !");
-                alertDialog.setButton("OK", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        alertDialog.dismiss();
-                    }
-                });
+                alertDialog.setButton("OK", (dialog, which) -> alertDialog.dismiss());
                 alertDialog.show();
             }
         }

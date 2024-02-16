@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "677006383408",
+    "project_id": "besp-a2b83",
+    "storage_bucket": "besp-a2b83.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:677006383408:android:bceea7f5a94cff31e4d0f5",
+        "android_client_info": {
+          "package_name": "com.bih.nic.e_wallet"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "677006383408-ifc48h6rsomqhd4akkjm25bcngj703t9.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCvOKlUDx3JmgT6juTRvTzJJxZ7qDYce1Y"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "677006383408-ifc48h6rsomqhd4akkjm25bcngj703t9.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

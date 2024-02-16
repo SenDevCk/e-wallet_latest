@@ -1,16 +1,14 @@
 package com.bih.nic.e_wallet.utilitties;
-
 import android.util.Log;
 
+
+import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
-import org.apache.http.NameValuePair;
 import org.apache.http.client.HttpClient;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.protocol.HTTP;
 
 import java.io.BufferedReader;
@@ -20,9 +18,6 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * Created by Chandan kumar on 11-03-2018.
  */
@@ -35,7 +30,8 @@ WebHandler {
         String result = null;
         try {
             HttpPost httpPost = new HttpPost(urls.trim());
-            httpPost.setEntity(new StringEntity(reqJson, HTTP.UTF_8));
+        //    httpPost.setEntity((HttpEntity) new StringEntity(reqJson, HTTP.UTF_8));
+            httpPost.setEntity((HttpEntity) new StringEntity(reqJson, HTTP.UTF_8));
             httpPost.setHeader("Content-type", "application/json");
             HttpClient httpclient = new DefaultHttpClient();
             HttpResponse httpResponse = httpclient.execute(httpPost);
@@ -44,17 +40,13 @@ WebHandler {
                 result = convertInputStreamToString(inputStream);
             else
                 result = null;
-
         } catch (Exception e) {
             e.printStackTrace();
             Utiilties.writeIntoLog(Log.getStackTraceString(e));
             result = null;
-
         }
         return result;
-
     }
-
     public static String callByPostwithoutparameter(String urls) {
         InputStream inputStream = null;
         String result = null;
@@ -63,7 +55,7 @@ WebHandler {
             HttpClient httpclient = new DefaultHttpClient();
             HttpPost httpPost = new HttpPost(urls);
             httpPost.setHeader("Content-type", "text/plain");
-            HttpResponse httpResponse = httpclient.execute(httpPost);
+            HttpResponse httpResponse = (HttpResponse) httpclient.execute(httpPost);
             inputStream = httpResponse.getEntity().getContent();
             if (inputStream != null)
                 result = convertInputStreamToString(inputStream);
@@ -112,18 +104,16 @@ WebHandler {
         String result = "";
         try {
             HttpClient httpclient = new DefaultHttpClient();
-            HttpResponse httpResponse = httpclient.execute(new HttpGet(urls));
+            HttpResponse httpResponse = (HttpResponse) httpclient.execute(new HttpGet(urls));
             inputStream = httpResponse.getEntity().getContent();
             if (inputStream != null)
                 result = convertInputStreamToString(inputStream);
             else
                 result = "Did not work!";
-
         } catch (Exception e) {
             Log.d("InputStream", e.getLocalizedMessage());
             Utiilties.writeIntoLog(Log.getStackTraceString(e));
         }
-
         return result;
     }
     public static String postwwwURL(final String postParameters, String urls) throws MalformedURLException {
@@ -152,7 +142,6 @@ WebHandler {
         String result = "";
         while ((line = bufferedReader.readLine()) != null)
             result += line;
-
         inputStream.close();
         return result;
     }

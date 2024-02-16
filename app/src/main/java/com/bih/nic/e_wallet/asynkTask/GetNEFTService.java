@@ -1,5 +1,4 @@
 package com.bih.nic.e_wallet.asynkTask;
-
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -10,9 +9,7 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.util.Log;
 import android.widget.Toast;
-
 import androidx.annotation.RequiresApi;
-
 import com.bih.nic.e_wallet.activities.GetNeftPayActivity;
 import com.bih.nic.e_wallet.activities.MainActivity;
 import com.bih.nic.e_wallet.dataBaseHandler.DataBaseHelper;

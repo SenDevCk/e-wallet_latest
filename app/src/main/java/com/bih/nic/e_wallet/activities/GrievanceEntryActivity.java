@@ -51,7 +51,7 @@ public class GrievanceEntryActivity extends AppCompatActivity implements View.On
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_grievance_entry);
         userInfo2=CommonPref.getUserDetails(GrievanceEntryActivity.this);
-        toolbar_sel_staement = (Toolbar) findViewById(R.id.toolbar_single_rec);
+        toolbar_sel_staement =  findViewById(R.id.toolbar_single_rec);
         toolbar_sel_staement.setTitle("Recharge Grievance");
         setSupportActionBar(toolbar_sel_staement);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -87,15 +87,15 @@ public class GrievanceEntryActivity extends AppCompatActivity implements View.On
     }
 
     private void init() {
-        tvdob = (TextView) findViewById(R.id.tvdob);
-        spn_bank = (Spinner) findViewById(R.id.spn_bank);
-        spn_paymode = (Spinner) findViewById(R.id.spn_paymode);
-        etben_fmlyhis = (TextInputEditText) findViewById(R.id.etben_fmlyhis);
-        etben_amt = (TextInputEditText) findViewById(R.id.etben_amt);
-        etben_sms = (TextInputEditText) findViewById(R.id.etben_sms);
-        button_submit = (Button) findViewById(R.id.button_submit);
-        btncaladob = (ImageView) findViewById(R.id.btncaladob);
-        check_term = (CheckBox) findViewById(R.id.check_term);
+        tvdob =  findViewById(R.id.tvdob);
+        spn_bank =  findViewById(R.id.spn_bank);
+        spn_paymode =  findViewById(R.id.spn_paymode);
+        etben_fmlyhis =  findViewById(R.id.etben_fmlyhis);
+        etben_amt =  findViewById(R.id.etben_amt);
+        etben_sms =  findViewById(R.id.etben_sms);
+        button_submit =  findViewById(R.id.button_submit);
+        btncaladob =  findViewById(R.id.btncaladob);
+        check_term =  findViewById(R.id.check_term);
         btncaladob.setOnClickListener(this);
         button_submit.setOnClickListener(this);
 

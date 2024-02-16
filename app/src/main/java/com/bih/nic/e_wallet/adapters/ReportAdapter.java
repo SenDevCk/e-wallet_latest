@@ -48,9 +48,9 @@ public class ReportAdapter extends BaseAdapter {
     @Override
     public View getView(final int position, View convertView, ViewGroup parent) {
         convertView=layoutInflater.inflate(R.layout.report_item, null, false);
-        TextView text_date=(TextView)convertView.findViewById(R.id.text_date);
-        TextView report_recept_no=(TextView)convertView.findViewById(R.id.report_recept_no);
-        TextView report_amount=(TextView)convertView.findViewById(R.id.report_amount);
+        TextView text_date=convertView.findViewById(R.id.text_date);
+        TextView report_recept_no=convertView.findViewById(R.id.report_recept_no);
+        TextView report_amount=convertView.findViewById(R.id.report_amount);
         LinearLayout ll_st_head=(LinearLayout)convertView.findViewById(R.id.ll_st_head);
         text_date.setText(""+ reportEntities.get(position).getDate());
         report_recept_no.setText(""+ reportEntities.get(position).getNo_of_recept());

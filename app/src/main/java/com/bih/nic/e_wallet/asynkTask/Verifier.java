@@ -153,15 +153,12 @@ public class Verifier extends AsyncTask<String, Void, String> {
         check_con_pay.setText("Transaction Pending ... Click Sync Again !");
         Button but_sync_again = (Button) activity.findViewById(R.id.but_sync_again);
         but_sync_again.setVisibility(View.VISIBLE);
-        but_sync_again.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                UserInfo2 userInfo2 = CommonPref.getUserDetails(activity);
-                if (Utiilties.isOnline(activity)) {
-                    new Verifier( activity).execute(req_string);
-                } else {
-                    Toast.makeText(activity, "Go online !", Toast.LENGTH_SHORT).show();
-                }
+        but_sync_again.setOnClickListener(view -> {
+            UserInfo2 userInfo2 = CommonPref.getUserDetails(activity);
+            if (Utiilties.isOnline(activity)) {
+                new Verifier( activity).execute(req_string);
+            } else {
+                Toast.makeText(activity, "Go online !", Toast.LENGTH_SHORT).show();
             }
         });
     }

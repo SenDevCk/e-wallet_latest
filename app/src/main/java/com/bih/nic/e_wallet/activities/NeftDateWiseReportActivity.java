@@ -3,12 +3,14 @@ package com.bih.nic.e_wallet.activities;
 import android.os.Bundle;
 import android.widget.Toast;
 
+
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
+
 
 import com.bih.nic.e_wallet.R;
 import com.bih.nic.e_wallet.asynkTask.NeftDatewiseService;
 import com.bih.nic.e_wallet.utilitties.Utiilties;
+import androidx.appcompat.widget.Toolbar;
 
 public class NeftDateWiseReportActivity extends AppCompatActivity {
 
@@ -18,7 +20,7 @@ public class NeftDateWiseReportActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_neft_date_wise_report);
-        toolbar_report = (Toolbar) findViewById(R.id.toolbar_report_neft);
+        toolbar_report =  findViewById(R.id.toolbar_report_neft);
         toolbar_report.setTitle("NEFT report (Datewise)");
         setSupportActionBar(toolbar_report);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);

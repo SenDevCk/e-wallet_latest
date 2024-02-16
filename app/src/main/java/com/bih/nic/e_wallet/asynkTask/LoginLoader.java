@@ -18,7 +18,6 @@ import android.widget.Toast;
 import androidx.annotation.RequiresApi;
 
 import com.bih.nic.e_wallet.R;
-import com.bih.nic.e_wallet.activities.LoginActivity;
 import com.bih.nic.e_wallet.activities.MainActivity;
 import com.bih.nic.e_wallet.entity.UserInfo2;
 import com.bih.nic.e_wallet.utilitties.CommonPref;
@@ -66,11 +65,7 @@ public class LoginLoader extends AsyncTask<String, Void, UserInfo2> {
                 result = WebHandler.callByPostwithoutparameter( Urls_this_pro.LOG_IN_URL+reqString(String.valueOf(strings[0])));
             }else{
                 alertDialog.setMessage("Your device must have atleast Kitkat or Above Version");
-                alertDialog.setButton("OK", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                    }
-                });
+                alertDialog.setButton("OK", (dialog, which) -> dialog.dismiss());
                 alertDialog.show();
             }
             if (result != null) {
@@ -95,10 +90,8 @@ public class LoginLoader extends AsyncTask<String, Void, UserInfo2> {
             if (result == null ) {
                 alertDialog.setTitle("Login Unsuccessful");
                 alertDialog.setMessage("Server not responding");
-                alertDialog.setButton("OK", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        //edit_user_name.setFocusable(true);
-                    }
+                alertDialog.setButton("OK", (dialog, which) -> {
+                    //edit_user_name.setFocusable(true);
                 });
                 alertDialog.show();
             } else if (result != null && !result.getAuthenticated()){
@@ -115,11 +108,7 @@ public class LoginLoader extends AsyncTask<String, Void, UserInfo2> {
                 }else{
                     alertDialog.setTitle("Login Unsuccessful");
                     alertDialog.setMessage(""+result.getMessageString());
-                    alertDialog.setButton("OK", new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int which) {
-                            edit_user_name.setFocusable(true);
-                        }
-                    });
+                    alertDialog.setButton("OK", (dialog, which) -> edit_user_name.setFocusable(true));
                     alertDialog.show();
                 }
             }
@@ -140,11 +129,7 @@ public class LoginLoader extends AsyncTask<String, Void, UserInfo2> {
                         } else {
                             alertDialog.setTitle("Device Not Registered");
                             alertDialog.setMessage(""+result.getMessageString());
-                            alertDialog.setButton("OK", new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int which) {
-                                    edit_user_name.setFocusable(true);
-                                }
-                            });
+                            alertDialog.setButton("OK", (dialog, which) -> edit_user_name.setFocusable(true));
                             alertDialog.show();
                         }
                     }
@@ -186,19 +171,11 @@ public class LoginLoader extends AsyncTask<String, Void, UserInfo2> {
         Button verify_pay = (Button) dialog.findViewById(R.id.verify);
         Button go_to_home = (Button) dialog.findViewById(R.id.go_to_home);
         // if button is clicked, close the custom dialog
-        go_to_home.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                dialog.dismiss();
-            }
-        });
-        verify_pay.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                dialog.dismiss();
-                UserInfo2 userInfo2=CommonPref.getUserDetails(activity);
-                new SmsVerificationService(activity,imei,serial_id).execute(edit_user_name.getText().toString().trim()+"|"+imei.trim()+"|"+otp_view.getOTP());
-            }
+        go_to_home.setOnClickListener(v -> dialog.dismiss());
+        verify_pay.setOnClickListener(v -> {
+            dialog.dismiss();
+            UserInfo2 userInfo2=CommonPref.getUserDetails(activity);
+            new SmsVerificationService(activity,imei,serial_id).execute(edit_user_name.getText().toString().trim()+"|"+imei.trim()+"|"+otp_view.getOTP());
         });
         dialog.show();
     }
