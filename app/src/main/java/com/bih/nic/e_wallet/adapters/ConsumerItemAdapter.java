@@ -73,14 +73,11 @@ public class ConsumerItemAdapter extends RecyclerView.Adapter<ConsumerItemAdapte
         });
         //holder.title.setText(homeitemEntities.get(position).getTitle());
         //holder.description.setText(homeitemEntities.get(position).getDescription());
-        holder.itemView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent=new Intent(activity, PayDetailsActivity.class);
-                intent.putExtra("flag","billed");
-                intent.putExtra("object",mruEntity);
-                activity.startActivity(intent);
-            }
+        holder.itemView.setOnClickListener(v -> {
+            Intent intent=new Intent(activity, PayDetailsActivity.class);
+            intent.putExtra("flag","billed");
+            intent.putExtra("object",mruEntity);
+            activity.startActivity(intent);
         });
         setAnimation(holder.itemView, position);
     }

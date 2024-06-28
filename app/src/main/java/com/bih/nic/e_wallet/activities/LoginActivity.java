@@ -86,7 +86,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     private boolean initse;
     private ProgressDialog dialog1;
     private SmsVerificationService smsVerificationService;
-
     private APIInterface apiInterface;
     ProgressDialog progressDialog;
     private AlertDialog alertDialog = null;
@@ -176,7 +175,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 // text_resend.setVisibility(View.GONE);
                 Log.d("activity", "" + messageText);
                 dialog1.dismiss();
-                //if (smsVerificationService!=null && smsVerificationService.getStatus()!=SmsVerificationService.Status.RUNNING) {
+                //if(smsVerificationService!=null && smsVerificationService.getStatus()!=SmsVerificationService.Status.RUNNING) {
                 if(!messageText.isEmpty()) {
                     //smsVerificationService = (SmsVerificationService) new SmsVerificationService(LoginActivity.this, imei, serial_id).execute(edit_user_name.getText().toString().trim() + "|" + imei.trim() + "|" + messageText.split(" ")[0].trim());
                     smsVerification(reqString(edit_user_name.getText().toString().trim() + "|" + imei.trim() + "|" + otp_view.getOTP()));
@@ -244,6 +243,8 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                                     startActivity(cPannel);
                                     finish();
                                 } catch (Exception ex) {
+                                    button_login.setEnabled(true);
+                                    ex.printStackTrace();
                                     Toast.makeText(LoginActivity.this, "Login failed due to Some Error !", Toast.LENGTH_SHORT).show();
                                 }
                             } else {
@@ -279,7 +280,9 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
             @Override
             public void onFailure(Call<UserInfo2> call, Throwable t) {
+                button_login.setEnabled(true);
                 Log.e("error", t.getMessage());
+                t.printStackTrace();
                 Toast.makeText(LoginActivity.this, "" + t.getMessage(), Toast.LENGTH_SHORT).show();
                 if (progressDialog.isShowing()) progressDialog.dismiss();
                 call.cancel();
@@ -454,7 +457,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
     @RequiresApi(api = Build.VERSION_CODES.S)
     private boolean checkAndRequestPermissions() {
-
         int storage = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE);
         int storage2 = ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
         int couselocation = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION);

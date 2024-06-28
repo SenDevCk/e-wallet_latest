@@ -6,13 +6,10 @@ package com.bih.nic.e_wallet.retrofit;
 
 public class Urls_this_pro {
 
-
-    //local
-    /*public static final String RETROFIT_BASE_URL = "http://192.168.0.151:65001/app/";
-    public static final String RETROFIT_BASE_URL2 = "http://192.168.0.118:8085/lmd-api/";*/
-
-    //live
-    public static final String RETROFIT_BASE_URL = "http://energypayment.bsphcl.co.in/ewallet/";
+    //production
+    //public static final String RETROFIT_BASE_URL = "http://energypayment.bsphcl.co.in/ewallet/";
+    //staging testing environment
+    public static final String RETROFIT_BASE_URL = "http://192.168.139.61/ewallet/";
 
 
 }

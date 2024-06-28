@@ -139,10 +139,10 @@ public class PinCodeActivity extends AppCompatActivity implements View.OnClickLi
 
         dialog.setContentView(R.layout.dialog_verify);
         dialog.setTitle("Verify");
-        TextView text_amount =  dialog.findViewById(R.id.text_amount);
+        TextView text_amount =  (TextView)dialog.findViewById(R.id.text_amount);
         text_amount.setText("Amount : " + amount.trim());
-        Button verify_pay =  dialog.findViewById(R.id.verify_pay);
-        Button cancel_pay =  dialog.findViewById(R.id.cancel_pay);
+        Button verify_pay =  (Button)dialog.findViewById(R.id.verify_pay);
+        Button cancel_pay =  (Button)dialog.findViewById(R.id.cancel_pay);
         // if button is clicked, close the custom dialog
         cancel_pay.setOnClickListener(v -> dialog.dismiss());
         verify_pay.setOnClickListener(v -> {
@@ -568,7 +568,6 @@ public class PinCodeActivity extends AppCompatActivity implements View.OnClickLi
 
 
     private boolean checkAndRequestPermissions() {
-
         int storage = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE);
         int storage2 = ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
         List<String> listPermissionsNeeded = new ArrayList<>();

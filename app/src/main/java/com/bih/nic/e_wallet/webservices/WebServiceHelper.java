@@ -106,6 +106,7 @@ public class WebServiceHelper {
                 bookNoEntity.setDATE_TIME(jsonObject.getString("DATE_TIME"));
                 bookNoEntity.setFA_HU_NAME(jsonObject.getString("FA_HU_NAME"));
                 bookNoEntity.setBILL_ADDR1(jsonObject.getString("BILL_ADDR1"));
+                bookNoEntity.setMETER_TYPE((jsonObject.has("METER_TYPE"))?jsonObject.getString("METER_TYPE"):"N/A");
                 if (jsonObject.getString("MESSAGE_STRING").equalsIgnoreCase("success"))
                     mruEntities.add(bookNoEntity);
             }

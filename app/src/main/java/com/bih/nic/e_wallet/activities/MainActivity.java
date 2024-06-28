@@ -294,7 +294,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         balance_loader.cancel(true);
                     }
                     img_rotate.startAnimation(rotation);
-//                    BalanceLoader.bindmListener(balance -> runOnUiThread(new Runnable() {
+ //                   BalanceLoader.bindmListener(balance -> runOnUiThread(new Runnable() {
 //                        @Override
 //                        public synchronized void run() {
 //                            text_bav_bal.setText(String.valueOf(balance).trim());
@@ -311,14 +311,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private void loadBalance(String reqString) {
         apiInterface = APIClient.getClient(com.bih.nic.e_wallet.retrofit.Urls_this_pro.RETROFIT_BASE_URL).create(APIInterface.class);
         Call<String> call1 = apiInterface.loadBalance(reqString);
-        progressDialog = new ProgressDialog(MainActivity.this);
-        progressDialog.setMessage("Fetching...");
-        progressDialog.setCancelable(false);
-        progressDialog.show();
+        //progressDialog = new ProgressDialog(MainActivity.this);
+        //progressDialog.setMessage("Fetching...");
+        //progressDialog.setCancelable(false);
+        //progressDialog.show();
         call1.enqueue(new Callback<String>() {
             @Override
             public void onResponse(Call<String> call, Response<String> response) {
-                if (progressDialog.isShowing()) progressDialog.dismiss();
+                //if (progressDialog.isShowing()) progressDialog.dismiss();
                 String result = null;
                 if (response.body() != null) result = response.body();
                 if (result != null) {
@@ -338,10 +338,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         }
                     } catch (Exception e) {
                         e.printStackTrace();
-                        Toast.makeText(MainActivity.this, ""+e.getMessage(), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(MainActivity.this, "Balance Not Found !", Toast.LENGTH_SHORT).show();
                     }
                 }else{
-                    Toast.makeText(MainActivity.this, "Server Problem", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MainActivity.this, "Balance Not Found !", Toast.LENGTH_SHORT).show();
                 }
 
             }
@@ -350,7 +350,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             public void onFailure(Call<String> call, Throwable t) {
                 Log.e("error", t.getMessage());
                 Toast.makeText(MainActivity.this, "" + t.getMessage(), Toast.LENGTH_SHORT).show();
-                if (progressDialog.isShowing()) progressDialog.dismiss();
+                //if (progressDialog.isShowing()) progressDialog.dismiss();
                 call.cancel();
             }
         });
@@ -962,7 +962,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         try {
             Intent someIntent = new Intent(MainActivity.this, PendingTransactionRecever.class); // intent to be launched
-
             // note this could be getActivity if you want to launch an activity
             someIntent.putExtra("time", when.getHours() + ":" + when.getMinutes() + ":" + when.getSeconds());
             PendingIntent pendingIntent = PendingIntent.getBroadcast(

@@ -24,6 +24,7 @@ public class MRUEntity implements Serializable{
     private String BILL_ADDR1;
     private String SUB_DIV_ID;
     private String LAST_PAY_DATE;
+    private String METER_TYPE;
 
     public String getId() {
         return id;
@@ -159,5 +160,13 @@ public class MRUEntity implements Serializable{
 
     public void setLAST_PAY_DATE(String LAST_PAY_DATE) {
         this.LAST_PAY_DATE = LAST_PAY_DATE;
+    }
+
+    public String getMETER_TYPE() {
+        return METER_TYPE;
+    }
+
+    public void setMETER_TYPE(String METER_TYPE) {
+        this.METER_TYPE = METER_TYPE;
     }
 }

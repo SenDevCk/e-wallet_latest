@@ -1,6 +1,7 @@
 package com.bih.nic.e_wallet.activities;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.bluetooth.BluetoothAdapter;
@@ -102,6 +103,7 @@ public class PrintReceptActivity extends AppCompatActivity implements ReceiveLis
     int printid1 = 0;
     private static final int MY_PERMISSIONS_REQUEST_ACCOUNTS = 1;
 
+    @SuppressLint("Range")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -715,10 +717,8 @@ public class PrintReceptActivity extends AppCompatActivity implements ReceiveLis
     private boolean createReceiptDataOfflineForanalogics() {
 
         UserInfo2 userinfo = CommonPref.getUserDetails(PrintReceptActivity.this);
-
         String method = "";
         StringBuilder textData = new StringBuilder();
-
         Bluetooth_Printer_2inch_prof_ThermalAPI printer = new Bluetooth_Printer_2inch_prof_ThermalAPI();
         Bitmap logoData = null;
         if (printer == null) {
@@ -777,7 +777,6 @@ public class PrintReceptActivity extends AppCompatActivity implements ReceiveLis
             return false;
         }
         textData = null;
-
         return true;
     }
 

@@ -105,8 +105,8 @@ public class Utiilties {
                 || Build.MODEL.contains("sdk_gphone_x86_64")
                 || Build.MANUFACTURER.contains("Genymotion")
                 || Build.MANUFACTURER.contains("genymotion")
-                || Build.MANUFACTURER.contains("Google")
-                || Build.MANUFACTURER.contains("google")
+                //|| Build.MANUFACTURER.contains("Google")
+                //|| Build.MANUFACTURER.contains("google")
                 || Build.PRODUCT.contains("sdk_google")
                 || Build.PRODUCT.contains("google_sdk")
                 || Build.PRODUCT.contains("sdk")
@@ -231,25 +231,19 @@ public class Utiilties {
 
 
     public static String getDateTime() {
-
         String date = getDateString();
         String a = "";
         StringTokenizer st = new StringTokenizer(date, " ");
         while (st.hasMoreTokens()) {
             a = st.nextToken();
         }
-
         if (a.equals("a.m.")) {
 
             date = date.replace(a, "AM");
         }
         if (a.equals("p.m.")) {
             date = date.replace(a, "PM");
-
-
         }
-
-
         return date;
     }
 
@@ -261,11 +255,9 @@ public class Utiilties {
         int month = cal.get(Calendar.MONTH);
         int year = cal.get(Calendar.YEAR);
         month = month + 1;
-
         int h = cal.get(Calendar.HOUR);
         int m = cal.get(Calendar.MINUTE);
         int s = cal.get(Calendar.SECOND);
-
         String date = day + "/" + month + "/" + year;
         return date;
 

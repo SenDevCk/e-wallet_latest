@@ -59,12 +59,7 @@ public class ConsumerListActivity extends AppCompatActivity {
         text_no_data_found= findViewById(R.id.text_no_data_found);
         recycler_list_consumer=findViewById(R.id.recycler_list_consumer);
         rel_search=findViewById(R.id.rel_search);
-        rel_search.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                setUpDialog();
-            }
-        });
+        rel_search.setOnClickListener(v -> setUpDialog());
 
         String from=getIntent().getStringExtra("from");
 
@@ -175,12 +170,7 @@ public class ConsumerListActivity extends AppCompatActivity {
             }
         });
         ImageView close_setup =  setup_dialog.findViewById(R.id.img_close);
-        close_setup.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                setup_dialog.dismiss();
-            }
-        });
+        close_setup.setOnClickListener(v -> setup_dialog.dismiss());
         Button search_for_mru =  setup_dialog.findViewById(R.id.search_for_mru);
         search_for_mru.setOnClickListener(v -> {
             // Close dialog
