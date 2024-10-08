@@ -25,6 +25,7 @@ import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.bih.nic.e_wallet.R;
+import com.bih.nic.e_wallet.asynkTask.BalanceLoader;
 import com.bih.nic.e_wallet.dataBaseHandler.DataBaseHelper;
 import com.bih.nic.e_wallet.entity.MRUEntity;
 import com.bih.nic.e_wallet.entity.Statement;
@@ -46,7 +47,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 /**
- * Created by NIC2 on 1/26/2018.
+ * Created by Chandan on 1/26/2018.
  */
 public class PayDetailsActivity extends AppCompatActivity implements View.OnClickListener {
     Button button_pay;
@@ -59,7 +60,7 @@ public class PayDetailsActivity extends AppCompatActivity implements View.OnClic
     EditText edit_mobile2, edit_payable_amount;
     CheckBox check_term;
     double bal = 0.00;
-    //BalanceLoader balance_loader;
+    BalanceLoader balance_loader;
     MRULoader mruLoader;
 
     String key = "_USER_DETAILS";
@@ -290,7 +291,7 @@ public class PayDetailsActivity extends AppCompatActivity implements View.OnClic
                     check_con_pay.setText("You already requested for this Consumer payment ! Please either syncronize or verify statement ! You can request for another payment for this Consumer after " + (15 - Utiilties.getNoOfMinutes(Utiilties.convertStringToTimestampSlash(Utiilties.getCurrentDateWithTime()), statement.getPayDate())) + "minuts / total 15 minuts ! ");
                     check_con_pay.startAnimation(fade_in);
                 }
-                else if (mruEntity1.getMETER_TYPE().startsWith("SMART")) {
+                else if (mruEntity1.getMETER_TYPE().equals("PREPAID")) {
                     payForPrepaid(mruEntity1, check_con_pay, fade_in);
                 }
                 else {
@@ -305,7 +306,7 @@ public class PayDetailsActivity extends AppCompatActivity implements View.OnClic
                     }
                 }
             } else {
-                if (mruEntity1.getMETER_TYPE().startsWith("SMART")) {
+                if (mruEntity1.getMETER_TYPE().equals("PREPAID")) {
                     payForPrepaid(mruEntity1, check_con_pay, fade_in);
                 }
                 else if (mruEntity1.getCON_ID().startsWith("2")) {
@@ -638,11 +639,11 @@ public class PayDetailsActivity extends AppCompatActivity implements View.OnClic
 
     @Override
     protected void onDestroy() {
-//        if (balance_loader != null) {
-//            if (balance_loader.getStatus() == AsyncTask.Status.RUNNING) {
-//                balance_loader.cancel(true);
-//            }
-//        }
+        if (balance_loader != null) {
+            if (balance_loader.getStatus() == AsyncTask.Status.RUNNING) {
+                balance_loader.cancel(true);
+            }
+        }
         if (mruLoader != null) {
             if (mruLoader.getStatus() == AsyncTask.Status.RUNNING) {
                 mruLoader.cancel(true);
@@ -693,11 +694,11 @@ public class PayDetailsActivity extends AppCompatActivity implements View.OnClic
                     text_meter_no.setText("" + mruEntities.get(0).getMETER_NO());
                     text_address.setText("" + mruEntities.get(0).getBILL_ADDR1());
                     edit_mobile2.setText("" + mruEntities.get(0).getMOBILE_NO());
-
+                    text_meter_type = findViewById(R.id.text_meter_type);
                     mruEntity.setPAYBLE_AMOUNT(mruEntities.get(0).getPAYBLE_AMOUNT());
                     UserInfo2 userInfo2 = CommonPref.getUserDetails(PayDetailsActivity.this);
-                    //balance_loader = (BalanceLoader) new BalanceLoader(PayDetailsActivity.this).execute(userInfo2.getUserID() + "|" + userInfo2.getPassword() + "|" + userInfo2.getImeiNo() + "|" + userInfo2.getSerialNo());
-                    loadBalance(reqString(userInfo2.getUserID() + "|" + userInfo2.getPassword() + "|" + userInfo2.getImeiNo() + "|" + userInfo2.getSerialNo()));
+                    balance_loader = (BalanceLoader) new BalanceLoader(PayDetailsActivity.this).execute(userInfo2.getUserID() + "|" + userInfo2.getPassword() + "|" + userInfo2.getImeiNo() + "|" + userInfo2.getImeiNo());
+                    //loadBalance(reqString(userInfo2.getUserID() + "|" + userInfo2.getPassword() + "|" + userInfo2.getImeiNo() + "|" + userInfo2.getImeiNo()));
                 } else {
                     Toast.makeText(PayDetailsActivity.this, "No record found !", Toast.LENGTH_SHORT).show();
                     finish();

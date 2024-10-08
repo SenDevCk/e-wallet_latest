@@ -51,11 +51,7 @@ public class GrievanceListService extends AsyncTask<String, Void, ArrayList<Griv
                 res = WebHandler.callByPostwithoutparameter( Urls_this_pro.GET_COMPLAIN_LiST + reqString(String.valueOf(strings[0])));
             }else {
                 alertDialog.setMessage("Your device must have atleast Kitkat or Above Version");
-                alertDialog.setButton("OK", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                    }
-                });
+                alertDialog.setButton("OK", (dialog, which) -> dialog.dismiss());
                 alertDialog.show();
             }
             statementMS = WebServiceHelper.GrievanceParser(res);

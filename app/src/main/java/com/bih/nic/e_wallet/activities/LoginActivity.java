@@ -200,7 +200,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         progressDialog.setMessage("Loading...");
         progressDialog.setCancelable(false);
         progressDialog.show();
-        call1.enqueue(new Callback<UserInfo2>() {
+        call1.enqueue(new Callback<>() {
             @Override
             public void onResponse(Call<UserInfo2> call, Response<UserInfo2> response) {
                 if (progressDialog.isShowing()) progressDialog.dismiss();
@@ -267,7 +267,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                             } else {
                                 button_login.setEnabled(true);
                                 Toast.makeText(LoginActivity.this, "User name and password not matched !", Toast.LENGTH_LONG).show();
-                                 String version1 = "App Version : " + version + " ( " + imei + " )";
+                                String version1 = "App Version : " + version + " ( " + imei + " )";
                                 ((TextView) findViewById(R.id.text_ver)).setText(version1);
                             }
                         } else {
@@ -317,16 +317,16 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         progressDialog.setMessage("Verifying...");
         progressDialog.setCancelable(false);
         progressDialog.show();
-        call1.enqueue(new Callback<String>() {
+        call1.enqueue(new Callback<>() {
             @Override
             public void onResponse(Call<String> call, Response<String> response) {
                 if (progressDialog.isShowing()) progressDialog.dismiss();
                 String result = null;
                 if (response.body() != null) result = response.body();
                 if (result != null) {
-                    Log.e("res","res varification :"+result);
+                    Log.e("res", "res varification :" + result);
                     if (result.contains("SUCCESS")) {
-                        new LoginLoader(LoginActivity.this,imei,serial_id).execute(edit_user_name.getText().toString() + "|" + edit_pass.getText().toString() + "|" + imei + "|" + serial_id);
+                        new LoginLoader(LoginActivity.this, imei, serial_id).execute(edit_user_name.getText().toString() + "|" + edit_pass.getText().toString() + "|" + imei + "|" + serial_id);
                     } else {
                         Toast.makeText(LoginActivity.this, "Invalid OTP", Toast.LENGTH_SHORT).show();
                     }
@@ -457,7 +457,12 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
     @RequiresApi(api = Build.VERSION_CODES.S)
     private boolean checkAndRequestPermissions() {
-        int storage = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE);
+        int read_media;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
+            read_media = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_MEDIA_IMAGES);
+        }else {
+            read_media = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE);
+        }
         int storage2 = ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
         int couselocation = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION);
         int read_sms = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_SMS);
@@ -465,9 +470,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         int bluetooth = ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH);
         int bluetooth_scan = ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_SCAN);
         int bluetooth_Connect = ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT);
-
         List<String> listPermissionsNeeded = new ArrayList<>();
-
         if (read_sms != PackageManager.PERMISSION_GRANTED) {
             listPermissionsNeeded.add(Manifest.permission.READ_SMS);
         }
@@ -480,8 +483,8 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         if (bluetooth != PackageManager.PERMISSION_GRANTED) {
             listPermissionsNeeded.add(Manifest.permission.BLUETOOTH);
         }
-        if (storage != PackageManager.PERMISSION_GRANTED) {
-            listPermissionsNeeded.add(Manifest.permission.READ_EXTERNAL_STORAGE);
+        if (read_media != PackageManager.PERMISSION_GRANTED) {
+            listPermissionsNeeded.add((android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU)?Manifest.permission.READ_MEDIA_IMAGES:Manifest.permission.READ_EXTERNAL_STORAGE);
         }
         if (storage2 != PackageManager.PERMISSION_GRANTED) {
             listPermissionsNeeded.add(Manifest.permission.WRITE_EXTERNAL_STORAGE);

@@ -244,6 +244,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
                 values.put("DATE_TIME", mruEntity.getDATE_TIME());
                 values.put("FA_HU_NAME", mruEntity.getFA_HU_NAME());
                 values.put("BILL_ADDR1", mruEntity.getBILL_ADDR1());
+                values.put("METER_TYPE", mruEntity.getMETER_TYPE());
                 values.put("USER_ID", userid);
                 String[] whereArgs = new String[]{mruEntity.getCON_ID().trim()};
                 c = db.update("MRU", values, "CON_ID=?", whereArgs);
@@ -294,6 +295,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
                 mruEntity.setDATE_TIME(cursor.getString(cursor.getColumnIndex("DATE_TIME")));
                 mruEntity.setFA_HU_NAME(cursor.getString(cursor.getColumnIndex("FA_HU_NAME")));
                 mruEntity.setBILL_ADDR1(cursor.getString(cursor.getColumnIndex("BILL_ADDR1")));
+                mruEntity.setMETER_TYPE(cursor.getString(cursor.getColumnIndex("METER_TYPE")));
                 mruEntities.add(mruEntity);
             }
         } catch (Exception e) {
@@ -338,6 +340,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
                 mruEntity.setDATE_TIME(cursor.getString(cursor.getColumnIndex("DATE_TIME")));
                 mruEntity.setFA_HU_NAME(cursor.getString(cursor.getColumnIndex("FA_HU_NAME")));
                 mruEntity.setBILL_ADDR1(cursor.getString(cursor.getColumnIndex("BILL_ADDR1")));
+                mruEntity.setMETER_TYPE(cursor.getString(cursor.getColumnIndex("METER_TYPE")));
                 mruEntities.add(mruEntity);
             }
         } catch (Exception e) {
@@ -729,6 +732,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         }
     }
 
+    @SuppressLint("Range")
     public long getPendingCount(String uid) {
         long c = -1;
         String quary = "select con_id from Statement where u_id= '" + uid + "' and (transStatus='TP' or transStatus='TI')";
@@ -816,6 +820,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         return c;
     }
 
+    @SuppressLint("Range")
     public ArrayList<MRUEntity> getUnbuiledConsumer(String userid, String... tokens) {
         ArrayList<MRUEntity> mruEntities = new ArrayList<>();
         mruEntities.clear();

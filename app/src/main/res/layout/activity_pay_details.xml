@@ -179,6 +179,8 @@
                         android:layout_weight=".6"
                         android:gravity="center_vertical"
                         android:hint="..."
+                        android:textStyle="bold"
+                        android:textColor="@android:color/holo_green_dark"
                         android:textSize="16sp" />
                 </LinearLayout>
                 <LinearLayout

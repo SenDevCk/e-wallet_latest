@@ -29,6 +29,9 @@ import com.bih.nic.e_wallet.utilitties.WebHandler;
 import com.bih.nic.e_wallet.webservices.WebServiceHelper;
 
 import java.util.ArrayList;
+/*
+  Created By Chandan
+ */
 
 public class DownloadUnbuiledConsumerService extends AsyncTask<String,Void,ArrayList<MRUEntity>> {
     Activity activity;
@@ -80,7 +83,7 @@ public class DownloadUnbuiledConsumerService extends AsyncTask<String,Void,Array
             if (mruEntities.size()>0){
                 long c= new DataBaseHelper(activity).saveUnbuiledConsumer(mruEntities,uid);
                 if (c>0){
-                    Toast.makeText(activity, "All Consumer saved ! Go to Unbilled Consumer List", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(activity, "All Consumer saved ! Go to Unbilled Consumer List !", Toast.LENGTH_SHORT).show();
                 }else{
                     Toast.makeText(activity, "Consumer not saved !", Toast.LENGTH_SHORT).show();
                 }
@@ -103,4 +106,5 @@ public class DownloadUnbuiledConsumerService extends AsyncTask<String,Void,Array
         Log.e("string",""+encString);
         return encString;
     }
+
 }

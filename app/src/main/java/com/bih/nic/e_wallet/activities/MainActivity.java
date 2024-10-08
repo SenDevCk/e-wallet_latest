@@ -294,21 +294,21 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         balance_loader.cancel(true);
                     }
                     img_rotate.startAnimation(rotation);
- //                   BalanceLoader.bindmListener(balance -> runOnUiThread(new Runnable() {
-//                        @Override
-//                        public synchronized void run() {
-//                            text_bav_bal.setText(String.valueOf(balance).trim());
-//                            img_rotate.clearAnimation();
-//                        }
-//                    }));
-                    //balance_loader = (BalanceLoader) (new BalanceLoader(MainActivity.this).execute(userInfo2.getUserID() + "|" + userInfo2.getPassword() + "|" + userInfo2.getImeiNo() + "|" + userInfo2.getSerialNo()));
-                    loadBalance(reqString(userInfo2.getUserID() + "|" + userInfo2.getPassword() + "|" + userInfo2.getImeiNo() + "|" + userInfo2.getSerialNo()));
+                    BalanceLoader.bindmListener(balance -> runOnUiThread(new Runnable() {
+                        @Override
+                        public synchronized void run() {
+                            text_bav_bal.setText(String.valueOf(balance).trim());
+                            img_rotate.clearAnimation();
+                        }
+                    }));
+                    balance_loader = (BalanceLoader) (new BalanceLoader(MainActivity.this).execute(userInfo2.getUserID() + "|" + userInfo2.getPassword() + "|" + userInfo2.getImeiNo() + "|" + userInfo2.getImeiNo()));
+                    //loadBalance(reqString(userInfo2.getUserID() + "|" + userInfo2.getPassword() + "|" + userInfo2.getImeiNo() + "|" + userInfo2.getSerialNo()));
                 }
             }
         }
     }
 
-    private void loadBalance(String reqString) {
+   /* private void loadBalance(String reqString) {
         apiInterface = APIClient.getClient(com.bih.nic.e_wallet.retrofit.Urls_this_pro.RETROFIT_BASE_URL).create(APIInterface.class);
         Call<String> call1 = apiInterface.loadBalance(reqString);
         //progressDialog = new ProgressDialog(MainActivity.this);
@@ -354,7 +354,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 call.cancel();
             }
         });
-    }
+    }*/
 
 
 

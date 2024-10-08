@@ -4,8 +4,10 @@ import android.Manifest;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
@@ -34,7 +36,9 @@ import com.bih.nic.e_wallet.retrofit.APIClient;
 import com.bih.nic.e_wallet.retrofit.APIInterface;
 import com.bih.nic.e_wallet.utilitties.CommonPref;
 import com.bih.nic.e_wallet.utilitties.GlobalVariables;
+import com.bih.nic.e_wallet.utilitties.Urls_this_pro;
 import com.bih.nic.e_wallet.utilitties.Utiilties;
+import com.bih.nic.e_wallet.utilitties.WebHandler;
 import com.mukesh.OtpView;
 
 import org.json.JSONException;
@@ -63,7 +67,7 @@ public class PinCodeActivity extends AppCompatActivity implements View.OnClickLi
     JSONObject jsonObject;
     CountDownTimer countDownTimer;
 
-   // Verifier verifier;
+    Verifier verifier;
 
     private APIInterface apiInterface;
 
@@ -156,11 +160,15 @@ public class PinCodeActivity extends AppCompatActivity implements View.OnClickLi
                     check_con_pay.startAnimation(fade_in);
                 } else {
                     check_con_pay.setVisibility(View.GONE);
-                    callServiceMakePayment(userInfo2);
+                    //callServiceMakePayment(userInfo2);
+                    new MakePaymentLoader().execute(userInfo2.getUserID() + "|" + userInfo2.getPassword() + "|" + userInfo2.getImeiNo() + "|"
+                + userInfo2.getSerialNo() + "|" + mruEntity.getBOOK_NO().trim() + "|" + mruEntity.getCON_ID().trim() + "|" + amount.trim() + "|" + otp_view.getOTP().toString().trim() + "|" + mobile.trim() + "|" + mruEntity.getBILL_NO().trim() + "|M|" + version + "|" + Utiilties.getCurrentDate());
                 }
             } else {
                 check_con_pay.setVisibility(View.GONE);
-                callServiceMakePayment(userInfo2);
+                //callServiceMakePayment(userInfo2);
+                new MakePaymentLoader().execute(userInfo2.getUserID() + "|" + userInfo2.getPassword() + "|" + userInfo2.getImeiNo() + "|"
+               + userInfo2.getSerialNo() + "|" + mruEntity.getBOOK_NO().trim() + "|" + mruEntity.getCON_ID().trim() + "|" + amount.trim() + "|" + otp_view.getOTP().toString().trim() + "|" + mobile.trim() + "|" + mruEntity.getBILL_NO().trim() + "|M|" + version + "|" + Utiilties.getCurrentDate());
             }
 
 
@@ -169,7 +177,7 @@ public class PinCodeActivity extends AppCompatActivity implements View.OnClickLi
         dialog.show();
     }
 
-    private void callServiceMakePayment(UserInfo2 userInfo2) {
+  /*  private void callServiceMakePayment(UserInfo2 userInfo2) {
 //        new MakePaymentLoader().execute(userInfo2.getUserID() + "|" + userInfo2.getPassword() + "|" + userInfo2.getImeiNo() + "|"
 //                + userInfo2.getSerialNo() + "|" + mruEntity.getBOOK_NO().trim() + "|" + mruEntity.getCON_ID().trim() + "|" + amount.trim() + "|" + otp_view.getOTP().toString().trim() + "|" + mobile.trim() + "|" + mruEntity.getBILL_NO().trim() + "|M|" + version + "|" + Utiilties.getCurrentDate());
        apiInterface = APIClient.getClient(com.bih.nic.e_wallet.retrofit.Urls_this_pro.RETROFIT_BASE_URL).create(APIInterface.class);
@@ -231,14 +239,14 @@ public class PinCodeActivity extends AppCompatActivity implements View.OnClickLi
                             finish();
                         } else {
                             //new DataBaseHelper(PinCodeActivity.this).deleteRequestedPayment(mruEntity.getCON_ID(),amount);
-                     /*  alertDialog.setMessage(""+jsonObject.getString("MESSAGE_STRING"));
+                     *//*  alertDialog.setMessage(""+jsonObject.getString("MESSAGE_STRING"));
                        alertDialog.setButton("OK", new DialogInterface.OnClickListener() {
                            @Override
                            public void onClick(DialogInterface dialogInterface, int i) {
                                dialogInterface.dismiss();
                            }
                        });
-                       alertDialog.show();*/
+                       alertDialog.show();*//*
                             if (jsonObject.getString("transStatus").equals("TP") || jsonObject.getString("transStatus").equals("TI")){
                                 if (jsonObject.getString("TRANS_ID").trim()!=null) {
                                     if (!jsonObject.getString("TRANS_ID").trim().equals("") && !jsonObject.getString("TRANS_ID").trim().equals("NA")) {
@@ -256,8 +264,8 @@ public class PinCodeActivity extends AppCompatActivity implements View.OnClickLi
                                                 UserInfo2 userInfo2 = CommonPref.getUserDetails(PinCodeActivity.this);
                                                 if (userInfo2 != null) {
                                                     try {
-                                                        //verifier = (Verifier) new Verifier(PinCodeActivity.this).execute(userInfo2.getUserID() + "|" + GlobalVariables.LoggedUser.getPassword() + "|" + userInfo2.getImeiNo() + "|" + userInfo2.getSerialNo() + "|" + jsonObject.getString("TRANS_ID").trim());
-                                                        callServiceVerify(userInfo2,jsonObject.getString("TRANS_ID").trim());
+                                                        verifier = (Verifier) new Verifier(PinCodeActivity.this).execute(userInfo2.getUserID() + "|" + GlobalVariables.LoggedUser.getPassword() + "|" + userInfo2.getImeiNo() + "|" + userInfo2.getSerialNo() + "|" + jsonObject.getString("TRANS_ID").trim());
+                                                        //callServiceVerify(userInfo2,jsonObject.getString("TRANS_ID").trim());
                                                     } catch (JSONException e) {
                                                         e.printStackTrace();
                                                     }
@@ -279,14 +287,14 @@ public class PinCodeActivity extends AppCompatActivity implements View.OnClickLi
                     }
                 } else {
                     //new DataBaseHelper(PinCodeActivity.this).deleteRequestedPayment(mruEntity.getCON_ID(),amount);
-            /*    alertDialog.setMessage("Something went Wrong ! May be Server Problem !");
+            *//*    alertDialog.setMessage("Something went Wrong ! May be Server Problem !");
                 alertDialog.setButton("OK", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         dialogInterface.dismiss();
                     }
                 });
-                alertDialog.show();*/
+                alertDialog.show();*//*
                     check_con_pay.setVisibility(View.VISIBLE);
                     check_con_pay.setText("Something went Wrong ! May be Server Problem !");
                     check_con_pay.startAnimation(fade_in);
@@ -302,9 +310,9 @@ public class PinCodeActivity extends AppCompatActivity implements View.OnClickLi
                 call.cancel();
             }
         });
-    }
+    }*/
 
-    private void callServiceVerify(UserInfo2 userInfo2,String tranId) {
+   /* private void callServiceVerify(UserInfo2 userInfo2,String tranId) {
         apiInterface = APIClient.getClient(com.bih.nic.e_wallet.retrofit.Urls_this_pro.RETROFIT_BASE_URL).create(APIInterface.class);
         Call<String> call1 = apiInterface.makeVerify(reqString(userInfo2.getUserID() + "|" + GlobalVariables.LoggedUser.getPassword() + "|" + userInfo2.getImeiNo() + "|" + userInfo2.getSerialNo() + "|" + tranId.trim()));
         progressDialog = new ProgressDialog(PinCodeActivity.this);
@@ -363,7 +371,7 @@ public class PinCodeActivity extends AppCompatActivity implements View.OnClickLi
                 call.cancel();
             }
         });
-    }
+    }*/
 
     private void syncStatement(String tid) {
         check_con_pay.setTextColor(getResources().getColor(android.R.color.holo_orange_dark));
@@ -373,14 +381,14 @@ public class PinCodeActivity extends AppCompatActivity implements View.OnClickLi
         but_sync_again.setOnClickListener(view -> {
             UserInfo2 userInfo2 = CommonPref.getUserDetails(PinCodeActivity.this);
             if (Utiilties.isOnline(PinCodeActivity.this)) {
-                callServiceVerify(userInfo2,tid);
+                //callServiceVerify(userInfo2,tid);
             } else {
                 Toast.makeText(PinCodeActivity.this, "Go online !", Toast.LENGTH_SHORT).show();
             }
         });
     }
 
-    /*private class MakePaymentLoader extends AsyncTask<String, Void, String> {
+    private class MakePaymentLoader extends AsyncTask<String, Void, String> {
         private final ProgressDialog dialog1 = new ProgressDialog(PinCodeActivity.this);
         private final AlertDialog alertDialog = new AlertDialog.Builder(PinCodeActivity.this).create();
 
@@ -421,11 +429,7 @@ public class PinCodeActivity extends AppCompatActivity implements View.OnClickLi
                     result = WebHandler.callByPostwithoutparameter( Urls_this_pro.MAKE_PAYMENT_URL + reqString(String.valueOf(strings[0])));
                 } else {
                     alertDialog.setMessage("Your device must have atleast Kitkat or Above Version");
-                    alertDialog.setButton("OK", new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int which) {
-                            dialog.dismiss();
-                        }
-                    });
+                    alertDialog.setButton("OK", (dialog, which) -> dialog.dismiss());
                     alertDialog.show();
                 }
             } else {
@@ -464,14 +468,14 @@ public class PinCodeActivity extends AppCompatActivity implements View.OnClickLi
                         finish();
                     } else {
                         //new DataBaseHelper(PinCodeActivity.this).deleteRequestedPayment(mruEntity.getCON_ID(),amount);
-                     *//*  alertDialog.setMessage(""+jsonObject.getString("MESSAGE_STRING"));
+                       alertDialog.setMessage(""+jsonObject.getString("MESSAGE_STRING"));
                        alertDialog.setButton("OK", new DialogInterface.OnClickListener() {
                            @Override
                            public void onClick(DialogInterface dialogInterface, int i) {
                                dialogInterface.dismiss();
                            }
                        });
-                       alertDialog.show();*//*
+                       alertDialog.show();
                      if (jsonObject.getString("transStatus").equals("TP") || jsonObject.getString("transStatus").equals("TI")){
                         if (jsonObject.getString("TRANS_ID").trim()!=null) {
                             if (!jsonObject.getString("TRANS_ID").trim().equals("") && !jsonObject.getString("TRANS_ID").trim().equals("NA")) {
@@ -511,14 +515,9 @@ public class PinCodeActivity extends AppCompatActivity implements View.OnClickLi
                 }
             } else {
                 //new DataBaseHelper(PinCodeActivity.this).deleteRequestedPayment(mruEntity.getCON_ID(),amount);
-            *//*    alertDialog.setMessage("Something went Wrong ! May be Server Problem !");
-                alertDialog.setButton("OK", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        dialogInterface.dismiss();
-                    }
-                });
-                alertDialog.show();*//*
+               alertDialog.setMessage("Something went Wrong ! May be Server Problem !");
+                alertDialog.setButton("OK", (dialogInterface, i) -> dialogInterface.dismiss());
+                alertDialog.show();
                 check_con_pay.setVisibility(View.VISIBLE);
                 check_con_pay.setText("Something went Wrong ! May be Server Problem !");
                 check_con_pay.startAnimation(fade_in);
@@ -555,7 +554,7 @@ public class PinCodeActivity extends AppCompatActivity implements View.OnClickLi
             alertDialog.show();
             //new DataBaseHelper(PinCodeActivity.this).deleteRequestedPayment(mruEntity.getCON_ID(), amount);
         }
-    }*/
+    }
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     public String reqString(String req_string) {

@@ -30,7 +30,6 @@ public class NeftDateWiseReportActivity extends AppCompatActivity {
         }else{
             Toast.makeText(this, "Please Enable internet Connection", Toast.LENGTH_SHORT).show();
         }
-
     }
 
     @Override

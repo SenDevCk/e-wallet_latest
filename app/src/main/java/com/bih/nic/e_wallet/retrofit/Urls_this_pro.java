@@ -7,9 +7,9 @@ package com.bih.nic.e_wallet.retrofit;
 public class Urls_this_pro {
 
     //production
-    //public static final String RETROFIT_BASE_URL = "http://energypayment.bsphcl.co.in/ewallet/";
+    public static final String RETROFIT_BASE_URL = "http://energypayment.bsphcl.co.in/ewallet/";
     //staging testing environment
-    public static final String RETROFIT_BASE_URL = "http://192.168.139.61/ewallet/";
+    //public static final String RETROFIT_BASE_URL = "http://192.168.139.61/ewallet/";
 
 
 }
