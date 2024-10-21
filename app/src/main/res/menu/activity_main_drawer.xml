@@ -69,4 +69,16 @@
             </group>
         </menu>
     </item>
+    <item android:title="Smart Meter" android:visible="false">
+        <menu>
+            <group
+                android:id="@+id/m4"
+                android:checkableBehavior="single">
+                <item
+                    android:id="@+id/drawer_fetch_balance"
+                    android:icon="@drawable/download"
+                    android:title="Fetch Consumer Balance" />
+            </group>
+        </menu>
+    </item>
 </menu>

@@ -9,6 +9,7 @@ import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.text.Html;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -22,6 +23,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.bih.nic.e_wallet.R;
@@ -32,6 +34,9 @@ import com.bih.nic.e_wallet.entity.Statement;
 import com.bih.nic.e_wallet.entity.UserInfo2;
 import com.bih.nic.e_wallet.retrofit.APIClient;
 import com.bih.nic.e_wallet.retrofit.APIInterface;
+import com.bih.nic.e_wallet.retrofitPoso.SmartConsumerDetail;
+import com.bih.nic.e_wallet.retrofitPoso.SmartMeterBalanceRequest;
+import com.bih.nic.e_wallet.retrofitPoso.SmartMeterDetail;
 import com.bih.nic.e_wallet.utilitties.CommonPref;
 import com.bih.nic.e_wallet.utilitties.Urls_this_pro;
 import com.bih.nic.e_wallet.utilitties.Utiilties;
@@ -50,12 +55,12 @@ import retrofit2.Response;
  * Created by Chandan on 1/26/2018.
  */
 public class PayDetailsActivity extends AppCompatActivity implements View.OnClickListener {
-    Button button_pay;
+    Button button_pay,check_smt_balance;
     Context context;
     androidx.appcompat.widget.Toolbar toolbar_pay;
     MRUEntity mruEntity;
     String flag_unbilled;
-    TextView text_deleer_name, text_acc_no, text_con_id,text_meter_type, text_old_con_id, text_meter_no, text_book_no;
+    TextView text_deleer_name, text_acc_no, text_con_id, text_meter_type, text_old_con_id, text_meter_no, text_book_no;
     TextView text_address, text_payable_amount;
     EditText edit_mobile2, edit_payable_amount;
     CheckBox check_term;
@@ -96,7 +101,7 @@ public class PayDetailsActivity extends AppCompatActivity implements View.OnClic
             text_payable_amount = findViewById(R.id.text_payable_amount);
             edit_payable_amount = findViewById(R.id.edit_payable_amount);
             check_term = findViewById(R.id.check_term);
-            text_deleer_name.setText(""+mruEntity.getCNAME());
+            text_deleer_name.setText("" + mruEntity.getCNAME());
             text_acc_no.setText("A/c- " + mruEntity.getACT_NO());
             text_con_id.setText("" + mruEntity.getCON_ID());
             text_meter_type.setText("" + mruEntity.getMETER_TYPE());
@@ -110,6 +115,13 @@ public class PayDetailsActivity extends AppCompatActivity implements View.OnClic
             text_payable_amount.setText("" + mruEntity.getPAYBLE_AMOUNT());
         }
         button_pay = findViewById(R.id.button_pay);
+        check_smt_balance = findViewById(R.id.check_smt_balance);
+        if (mruEntity.getMETER_TYPE().equals("PREPAID")){
+            check_smt_balance.setVisibility(View.VISIBLE);
+            check_smt_balance.setOnClickListener(this);
+        } else {
+            check_smt_balance.setVisibility(View.GONE);
+        }
         button_pay.setOnClickListener(this);
 //        BalanceLoader.bindmListener(balance -> {
 //            bal = balance;
@@ -144,6 +156,9 @@ public class PayDetailsActivity extends AppCompatActivity implements View.OnClic
             }
 
         }
+        else if (v.getId() == R.id.check_smt_balance) {
+            loadSmartMeterBalance(new SmartMeterBalanceRequest(mruEntity.getCON_ID().trim()));
+        }
     }
 
     @Override
@@ -156,7 +171,10 @@ public class PayDetailsActivity extends AppCompatActivity implements View.OnClic
     protected void onResume() {
         super.onResume();
         UserInfo2 userInfo2 = CommonPref.getUserDetails(context);
-        if (Utiilties.isOnline(PayDetailsActivity.this)) {
+        if(userInfo2.getUserID().startsWith("2") && mruEntity.getMETER_TYPE().equals("PREPAID")){
+            loadSmartConsumerDetails(mruEntity.getCON_ID());
+        }
+        else if (Utiilties.isOnline(PayDetailsActivity.this)) {
             mruLoader = (MRULoader) new MRULoader().execute(userInfo2.getUserID() + "|" + userInfo2.getPassword() + "|" + userInfo2.getImeiNo() + "|" + userInfo2.getSerialNo() + "|NA|" + mruEntity.getCON_ID().trim() + "|NA");
         } else {
             text_payable_amount.setText("Please connect to internet !");
@@ -224,7 +242,15 @@ public class PayDetailsActivity extends AppCompatActivity implements View.OnClic
     public boolean onCreateOptionsMenu(Menu menu) {
         super.onCreateOptionsMenu(menu);
         getMenuInflater().inflate(R.menu.pay_details_menu, menu);
+        //if (mruEntity1.getMETER_TYPE().equals("PREPAID")) {
         return true;
+    }
+
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        MenuItem item = menu.findItem(R.id.smat_bal_menu);
+        item.setVisible(mruEntity.getMETER_TYPE().equals("PREPAID"));
+        return super.onPrepareOptionsMenu(menu);
     }
 
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -240,6 +266,10 @@ public class PayDetailsActivity extends AppCompatActivity implements View.OnClic
                 }
                 break;
             }
+            case R.id.smat_bal_menu: {
+                loadSmartMeterBalance(new SmartMeterBalanceRequest(mruEntity.getCON_ID().trim()));
+                break;
+            }
             case android.R.id.home: {
                 finish();
                 break;
@@ -248,6 +278,89 @@ public class PayDetailsActivity extends AppCompatActivity implements View.OnClic
         return true;
     }
 
+    private void loadSmartMeterBalance(SmartMeterBalanceRequest smartMeterBalanceRequest) {
+        apiInterface = APIClient.getClient(com.bih.nic.e_wallet.retrofit.Urls_this_pro.RETROFIT_BASE_URL2).create(APIInterface.class);
+        Call<SmartMeterDetail> call1 = apiInterface.getSmartMeterBalance(smartMeterBalanceRequest);
+        progressDialog = new ProgressDialog(PayDetailsActivity.this);
+        progressDialog.setMessage("Loading...");
+        progressDialog.setCancelable(false);
+        progressDialog.show();
+        call1.enqueue(new Callback<>() {
+            @Override
+            public void onResponse(Call<SmartMeterDetail> call, Response<SmartMeterDetail> response) {
+                if (progressDialog.isShowing()) progressDialog.dismiss();
+                SmartMeterDetail result = null;
+                if (response.body() != null) result = response.body();
+                AlertDialog.Builder builder = new AlertDialog.Builder(PayDetailsActivity.this);
+                builder.setTitle( mruEntity.getCON_ID());
+                if (result != null) {
+                    builder.setMessage(Html.fromHtml("Hello "+mruEntity.getCNAME()+","+"\n" + "  " + "your Smart meter balance " + ((result.getMeterBalance()==null)?"not found .":"is <b style=\"color:Tomato;\">:"+result.getMeterBalance()) + "</b> " + ((result.getConnectionStatus() == 0) ? "You are connected." : (result.getConnectionStatus() == 1) ? "you are disconnected." : " .Found some <b style=\"color:Tomato;\">:error !.</b>")))
+                            .setPositiveButton(R.string.ok, (dialog, id) -> {
+                                // User cancels the dialog.
+                                dialog.dismiss();
+                            });
+                } else {
+                    builder.setMessage("Details not found !")
+                            .setPositiveButton(R.string.ok, (dialog, id) -> {
+                                // User cancels the dialog.
+                                dialog.dismiss();
+                            });
+                }
+                // Create the AlertDialog object and return it.
+                AlertDialog alert11 = builder.create();
+                alert11.show();
+            }
+
+            @Override
+            public void onFailure(Call<SmartMeterDetail> call, Throwable t) {
+                Log.e("error", t.getMessage());
+                t.printStackTrace();
+                Toast.makeText(PayDetailsActivity.this, "" + t.getMessage(), Toast.LENGTH_SHORT).show();
+                if (progressDialog.isShowing()) progressDialog.dismiss();
+                call.cancel();
+            }
+        });
+    }
+
+    private void loadSmartConsumerDetails(final String SmartConsumerId) {
+        apiInterface = APIClient.getClient(com.bih.nic.e_wallet.retrofit.Urls_this_pro.RETROFIT_BASE_URL2).create(APIInterface.class);
+        Call<SmartConsumerDetail> call1 = apiInterface.getRuralConsumerDetails(SmartConsumerId);
+        progressDialog = new ProgressDialog(PayDetailsActivity.this);
+        progressDialog.setMessage("Loading...");
+        progressDialog.setCancelable(false);
+        progressDialog.show();
+        call1.enqueue(new Callback<>() {
+            @Override
+            public void onResponse(Call<SmartConsumerDetail> call, Response<SmartConsumerDetail> response) {
+                if (progressDialog.isShowing()) progressDialog.dismiss();
+                SmartConsumerDetail result = null;
+                if (response.body() != null) result = response.body();
+                AlertDialog.Builder builder = new AlertDialog.Builder(PayDetailsActivity.this);
+                builder.setTitle( mruEntity.getCON_ID());
+                if (result != null) {
+                        
+                } else {
+                    builder.setMessage("Details not found !")
+                            .setPositiveButton(R.string.ok, (dialog, id) -> {
+                                // User cancels the dialog.
+                                dialog.dismiss();
+                            });
+                }
+                // Create the AlertDialog object and return it.
+                AlertDialog alert11 = builder.create();
+                alert11.show();
+            }
+
+            @Override
+            public void onFailure(Call<SmartConsumerDetail> call, Throwable t) {
+                Log.e("error", t.getMessage());
+                t.printStackTrace();
+                Toast.makeText(PayDetailsActivity.this, "" + t.getMessage(), Toast.LENGTH_SHORT).show();
+                if (progressDialog.isShowing()) progressDialog.dismiss();
+                call.cancel();
+            }
+        });
+    }
     public void AlertDialogForCheckDetails(final MRUEntity mruEntity1) {
         final Dialog dialog = new Dialog(PayDetailsActivity.this);
         /*	dialog.requestWindowFeature(Window.FEATURE_NO_TITLE); //before*/
@@ -290,14 +403,12 @@ public class PayDetailsActivity extends AppCompatActivity implements View.OnClic
                     check_con_pay.setVisibility(View.VISIBLE);
                     check_con_pay.setText("You already requested for this Consumer payment ! Please either syncronize or verify statement ! You can request for another payment for this Consumer after " + (15 - Utiilties.getNoOfMinutes(Utiilties.convertStringToTimestampSlash(Utiilties.getCurrentDateWithTime()), statement.getPayDate())) + "minuts / total 15 minuts ! ");
                     check_con_pay.startAnimation(fade_in);
-                }
-                else if (mruEntity1.getMETER_TYPE().equals("PREPAID")) {
+                } else if (mruEntity1.getMETER_TYPE().equals("PREPAID")) {
                     payForPrepaid(mruEntity1, check_con_pay, fade_in);
-                }
-                else {
+                } else {
                     if (mruEntity1.getCON_ID().startsWith("2")) {
                         pay(mruEntity1, check_con_pay, fade_in);
-                    }  else {
+                    } else {
                         if (mruEntity1.getTARIFF_ID().equalsIgnoreCase("KJ")) {
                             pay_North_KJ(mruEntity1, check_con_pay, fade_in);
                         } else {
@@ -308,10 +419,9 @@ public class PayDetailsActivity extends AppCompatActivity implements View.OnClic
             } else {
                 if (mruEntity1.getMETER_TYPE().equals("PREPAID")) {
                     payForPrepaid(mruEntity1, check_con_pay, fade_in);
-                }
-                else if (mruEntity1.getCON_ID().startsWith("2")) {
+                } else if (mruEntity1.getCON_ID().startsWith("2")) {
                     pay(mruEntity1, check_con_pay, fade_in);
-                }   else {
+                } else {
                     if (mruEntity1.getTARIFF_ID().equalsIgnoreCase("KJ")) {
                         pay_North_KJ(mruEntity1, check_con_pay, fade_in);
                     } else {
@@ -324,16 +434,16 @@ public class PayDetailsActivity extends AppCompatActivity implements View.OnClic
         dialog.show();
     }
 
-    private void payForPrepaid(MRUEntity mruEntity1, final TextView check_con_pay, Animation fade_in){
-        double paying_amt=((Double.parseDouble(mruEntity1.getPAYBLE_AMOUNT())*5)>10000)?(Double.parseDouble(mruEntity1.getPAYBLE_AMOUNT())*5):10000;
-        Log.e("paying_amt",String.valueOf(paying_amt));
-             if (Double.parseDouble(edit_payable_amount.getText().toString()) > paying_amt) {
-                check_con_pay.setVisibility(View.VISIBLE);
-                check_con_pay.setText(" You can't pay more than Rs. " + paying_amt);
-                check_con_pay.startAnimation(fade_in);
-            } else {
-                navigationIntent(mruEntity1);
-            }
+    private void payForPrepaid(MRUEntity mruEntity1, final TextView check_con_pay, Animation fade_in) {
+        double paying_amt = ((Double.parseDouble(mruEntity1.getPAYBLE_AMOUNT()) * 5) > 10000) ? (Double.parseDouble(mruEntity1.getPAYBLE_AMOUNT()) * 5) : 10000;
+        Log.e("paying_amt", String.valueOf(paying_amt));
+        if (Double.parseDouble(edit_payable_amount.getText().toString()) > paying_amt) {
+            check_con_pay.setVisibility(View.VISIBLE);
+            check_con_pay.setText(" You can't pay more than Rs. " + paying_amt);
+            check_con_pay.startAnimation(fade_in);
+        } else {
+            navigationIntent(mruEntity1);
+        }
     }
 
     private void pay(MRUEntity mruEntity1, final TextView check_con_pay, Animation fade_in) {

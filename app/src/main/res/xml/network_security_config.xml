@@ -3,5 +3,6 @@
     <domain-config cleartextTrafficPermitted="true">
        <domain includeSubdomains="true">energypayment.bsphcl.co.in</domain>
         <domain includeSubdomains="true">192.168.139.61</domain>
+        <domain includeSubdomains="true">energyservices.bsphcl.co.in</domain>
     </domain-config>
 </network-security-config>

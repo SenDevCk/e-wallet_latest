@@ -13,10 +13,16 @@
     <uses-permission android:name="android.permission.BLUETOOTH_SCAN" />
     <uses-permission android:name="android.permission.BLUETOOTH" />
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
-    <permission android:name="android.permission.BLUETOOTH" android:label="BLUETOOTH" />
-    <permission android:name="android.permission.BLUETOOTH_ADMIN" />
+    <permission android:name="android.permission.BLUETOOTH" android:label="BLUETOOTH"
+        tools:ignore="ReservedSystemPermission" />
+    <permission android:name="android.permission.BLUETOOTH_ADMIN"
+        tools:ignore="ReservedSystemPermission" />
     <uses-feature android:name="android.hardware.bluetooth" android:required="false"/>
     <uses-feature android:name="android.hardware.bluetooth_le" android:required="false"/>
+    <uses-feature
+        android:name="android.hardware.telephony"
+        android:required="false" />
+
     <uses-permission
         android:name="android.permission.MOUNT_UNMOUNT_FILESYSTEMS"
         tools:ignore="ProtectedPermissions" />
@@ -53,12 +59,11 @@
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true"
         tools:replace="android:allowBackup"
-        tools:targetApi="n">
-        <activity android:name=".activities.WebReportActivity"/>
-        <activity android:name=".activities.NeftDateWiseReportActivity"/>
-        <activity android:name=".activities.GrivanceListActivity" />
-        <activity android:name=".activities.GrievanceEntryActivity" />
-        <activity android:name=".activities.ReportActivity" />
+       >
+        <!-- tools:targetApi="n"-->
+        <uses-library
+            android:name="org.apache.http.legacy"
+            android:required="false" />
         <activity android:name=".activities.SplashActivity"
             android:exported="true">
             <intent-filter>
@@ -67,18 +72,24 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity> <!-- C5:14:E5:56:CD:30:BB:B5:90:35:A9:85:49:62:E4:F9:2E:B0:B3:24 -->
-        <uses-library
-            android:name="org.apache.http.legacy"
-            android:required="false" />
-
-        <activity
-            android:name=".activities.MainActivity"
-            android:label=""
-            android:screenOrientation="portrait" />
         <activity
             android:name=".activities.LoginActivity"
             android:label=""
             android:screenOrientation="portrait" />
+        <activity
+            android:name=".activities.MainActivity"
+            android:label=""
+            android:screenOrientation="portrait" />
+        <activity android:name=".activities.WebReportActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".activities.NeftDateWiseReportActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".activities.GrivanceListActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".activities.GrievanceEntryActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".activities.ReportActivity"
+            android:screenOrientation="portrait"/>
         <activity
             android:name=".activities.BookNoActivity"
             android:label=""

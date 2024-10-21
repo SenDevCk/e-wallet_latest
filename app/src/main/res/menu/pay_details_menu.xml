@@ -6,4 +6,8 @@
         app:showAsAction="ifRoom"
         android:icon="@android:drawable/ic_popup_sync"
         />
+    <item android:id="@+id/smat_bal_menu"
+        android:title="Fetch Smart Meter Balance"
+        android:icon="@android:drawable/stat_sys_download"
+        />
 </menu>

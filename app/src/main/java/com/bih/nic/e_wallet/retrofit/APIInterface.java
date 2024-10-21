@@ -3,8 +3,12 @@ package com.bih.nic.e_wallet.retrofit;
 
 
 import com.bih.nic.e_wallet.entity.UserInfo2;
+import com.bih.nic.e_wallet.retrofitPoso.SmartConsumerDetail;
+import com.bih.nic.e_wallet.retrofitPoso.SmartMeterBalanceRequest;
+import com.bih.nic.e_wallet.retrofitPoso.SmartMeterDetail;
 
 import retrofit2.Call;
+import retrofit2.http.Body;
 import retrofit2.http.Field;
 import retrofit2.http.GET;
 import retrofit2.http.POST;
@@ -24,6 +28,13 @@ public interface APIInterface {
     Call<String> makeVerify(@Query("reqStr") String reqStr);
     @POST("/ewallet/api/nic/balanceEnq?")
     Call<String> loadBalance(@Query("reqStr") String reqStr);
+
+     @POST("/secureV05/webapi/myresource/smartStatus")
+    Call<SmartMeterDetail> getSmartMeterBalance(@Body SmartMeterBalanceRequest smartMeterBalanceRequest);
+
+    @GET("/webapi/myresource/getConsDetailsForOnlinePayment?")
+    Call<SmartConsumerDetail> getRuralConsumerDetails(@Query("ConsumerId") String ConsumerId);
+
 
 //
 //    @GET("/app/dashboard/m/all/{locationType}/{location}")

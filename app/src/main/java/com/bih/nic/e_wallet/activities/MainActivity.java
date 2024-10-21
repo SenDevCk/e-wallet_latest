@@ -61,12 +61,15 @@ import com.bih.nic.e_wallet.entity.UserInfo2;
 import com.bih.nic.e_wallet.interfaces.BalanceListner;
 import com.bih.nic.e_wallet.retrofit.APIClient;
 import com.bih.nic.e_wallet.retrofit.APIInterface;
+import com.bih.nic.e_wallet.retrofitPoso.SmartMeterBalanceRequest;
+import com.bih.nic.e_wallet.retrofitPoso.SmartMeterDetail;
 import com.bih.nic.e_wallet.utilitties.CommonPref;
 import com.bih.nic.e_wallet.utilitties.Urls_this_pro;
 import com.bih.nic.e_wallet.utilitties.Utiilties;
 import com.bih.nic.e_wallet.utilitties.WebHandler;
 import com.bih.nic.e_wallet.webservices.WebServiceHelper;
 import com.google.android.material.navigation.NavigationView;
+import com.google.android.material.textfield.TextInputEditText;
 
 import org.json.JSONObject;
 
@@ -116,6 +119,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private APIInterface apiInterface;
 
     ProgressDialog progressDialog;
+    LinearLayout ll_sm_det;
+    TextView text_con_id_sm ,text_balance_sm ,text_active_sm;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -248,13 +253,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             UserInfo2 userInfo2 = CommonPref.getUserDetails(MainActivity.this);
             startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("http://energybills.bsphcl.co.in/WebApplication1/newjsp.jsp?walletId=" + userInfo2.getWalletId().trim())));
             //startActivity(new Intent(MainActivity.this,WebReportActivity.class));
-        } else {
+        } else if (id==R.id.drawer_fetch_balance){
+            dilogFetchSmartMeterConsumerBalance();
+        }
+        else {
             Toast.makeText(this, "Under Process..", Toast.LENGTH_SHORT).show();
         }
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
+
+
 
     @Override
     public void onClick(View v) {
@@ -811,6 +821,66 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
             if (this.dialog1.isShowing()) this.dialog1.cancel();
         }
+    }
+
+    private void dilogFetchSmartMeterConsumerBalance() {
+        final Dialog setup_dialog = new Dialog(MainActivity.this);
+        // Include dialog.xml file
+        setup_dialog.setContentView(R.layout.smart_met_con_bal_dialog);
+        // Set dialog title
+        setup_dialog.setTitle("");
+        setup_dialog.setCancelable(false);
+        // set values for custom dialog components - text, image and button
+        ll_sm_det =  setup_dialog.findViewById(R.id.ll_sm_det);
+        ll_sm_det.setVisibility(View.GONE);
+        text_con_id_sm =  setup_dialog.findViewById(R.id.text_con_id_sm);
+        text_balance_sm =  setup_dialog.findViewById(R.id.text_balance_sm);
+        text_active_sm =  setup_dialog.findViewById(R.id.text_active_sm);
+        final EditText edit_conid_smart_met =  setup_dialog.findViewById(R.id.edit_conid_smart_met);
+        ImageView close_setup =  setup_dialog.findViewById(R.id.img_close);
+        close_setup.setOnClickListener(v -> setup_dialog.dismiss());
+        Button fetch_smart_met_det =  setup_dialog.findViewById(R.id.fetch_smart_met_det);
+        fetch_smart_met_det.setOnClickListener(v -> {
+            // Close dialog
+            if (edit_conid_smart_met.getText().toString().trim().equals("")) {
+                Toast.makeText(MainActivity.this,"Enter ConsumerId",Toast.LENGTH_LONG).show();
+            }  else {
+                loadSmartMeterBalance(new SmartMeterBalanceRequest(edit_conid_smart_met.getText().toString().trim()),setup_dialog);
+            }
+        });
+        setup_dialog.show();
+    }
+
+    private void loadSmartMeterBalance(SmartMeterBalanceRequest smartMeterBalanceRequest,Dialog setup_dialog) {
+        apiInterface = APIClient.getClient(com.bih.nic.e_wallet.retrofit.Urls_this_pro.RETROFIT_BASE_URL2).create(APIInterface.class);
+        Call<SmartMeterDetail> call1 = apiInterface.getSmartMeterBalance(smartMeterBalanceRequest);
+        progressDialog = new ProgressDialog(MainActivity.this);
+        progressDialog.setMessage("Loading...");
+        progressDialog.setCancelable(false);
+        progressDialog.show();
+        call1.enqueue(new Callback<>() {
+            @Override
+            public void onResponse(Call<SmartMeterDetail> call, Response<SmartMeterDetail> response) {
+                if (progressDialog.isShowing()) progressDialog.dismiss();
+                SmartMeterDetail result = null;
+                if (response.body() != null) result = response.body();
+                if (result != null) {
+                    ll_sm_det.setVisibility(View.VISIBLE);
+                    text_con_id_sm.setText(""+result.getConsumerId());
+                    text_balance_sm.setText(""+result.getMeterBalance());
+                    text_active_sm.setText(""+((result.getConnectionStatus()==0)?"Connected":(result.getConnectionStatus()==1)?"Disconnected":"Error"));
+                }
+            }
+
+            @Override
+            public void onFailure(Call<SmartMeterDetail> call, Throwable t) {
+                Log.e("error", t.getMessage());
+                t.printStackTrace();
+                Toast.makeText(MainActivity.this, "" + t.getMessage(), Toast.LENGTH_SHORT).show();
+                if (progressDialog.isShowing()) progressDialog.dismiss();
+                call.cancel();
+            }
+        });
     }
 
     private void bluetooth(int printid) {
