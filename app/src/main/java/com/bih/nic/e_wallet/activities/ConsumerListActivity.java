@@ -1,5 +1,7 @@
 package com.bih.nic.e_wallet.activities;
 
+import static java.util.Arrays.stream;
+
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
@@ -28,9 +30,14 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bih.nic.e_wallet.R;
 import com.bih.nic.e_wallet.adapters.ConsumerItemAdapter;
+import com.bih.nic.e_wallet.asynkTask.BalanceLoader;
 import com.bih.nic.e_wallet.dataBaseHandler.DataBaseHelper;
+import com.bih.nic.e_wallet.entity.BookNoEntity;
 import com.bih.nic.e_wallet.entity.MRUEntity;
 import com.bih.nic.e_wallet.entity.UserInfo2;
+import com.bih.nic.e_wallet.retrofit.APIClient;
+import com.bih.nic.e_wallet.retrofit.APIInterface;
+import com.bih.nic.e_wallet.retrofitPoso.SmartConsumerDetail;
 import com.bih.nic.e_wallet.utilitties.CommonPref;
 import com.bih.nic.e_wallet.utilitties.Urls_this_pro;
 import com.bih.nic.e_wallet.utilitties.Utiilties;
@@ -38,6 +45,12 @@ import com.bih.nic.e_wallet.utilitties.WebHandler;
 import com.bih.nic.e_wallet.webservices.WebServiceHelper;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class ConsumerListActivity extends AppCompatActivity {
     RecyclerView recycler_list_consumer;
@@ -46,6 +59,10 @@ public class ConsumerListActivity extends AppCompatActivity {
     ConsumerItemAdapter consumerItemAdapter;
     ArrayList<MRUEntity> mruEntities;
     RelativeLayout rel_search;
+    private APIInterface apiInterface;
+
+    ProgressDialog progressDialog;
+    AlertDialog alertDialog ;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -76,6 +93,7 @@ public class ConsumerListActivity extends AppCompatActivity {
         if (mruEntities!=null) {
             if (mruEntities.size() > 0) {
                 text_no_data_found.setVisibility(View.GONE);
+                recycler_list_consumer.setVisibility(View.VISIBLE);
                 consumerItemAdapter = new ConsumerItemAdapter(mruEntities, ConsumerListActivity.this);
                 RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(ConsumerListActivity.this);
                 recycler_list_consumer.setLayoutManager(mLayoutManager);
@@ -177,7 +195,7 @@ public class ConsumerListActivity extends AppCompatActivity {
                 UserInfo2 userInfo2= CommonPref.getUserDetails(ConsumerListActivity.this);
                 if (edit_con_id.getText().toString().trim().length()>0) {
                     setup_dialog.dismiss();
-                    new MRULoader().execute(userInfo2.getUserID() + "|" +userInfo2.getPassword() + "|" + userInfo2.getImeiNo() + "|" + userInfo2.getSerialNo() + "|NA|" + edit_con_id.getText().toString().trim() + "|NA");
+                    new MRULoader(edit_con_id.getText().toString().trim()).execute(userInfo2.getUserID() + "|" +userInfo2.getPassword() + "|" + userInfo2.getImeiNo() + "|" + userInfo2.getSerialNo() + "|NA|" + edit_con_id.getText().toString().trim() + "|NA");
                 }else if (edit_acount_no.getText().toString().trim().length()>0) {
                     setup_dialog.dismiss();
                     new MRULoader().execute(userInfo2.getUserID() + "|" + userInfo2.getPassword() + "|" + userInfo2.getImeiNo() + "|" + userInfo2.getSerialNo() + "|NA|NA|" + edit_acount_no.getText().toString().trim());
@@ -198,6 +216,13 @@ public class ConsumerListActivity extends AppCompatActivity {
         private final ProgressDialog dialog1 = new ProgressDialog(ConsumerListActivity.this);
         private final AlertDialog alertDialog = new AlertDialog.Builder(ConsumerListActivity.this).create();
 
+        String conId=null;
+        MRULoader(){
+
+        }
+        MRULoader(String conId){
+          this.conId=conId;
+        }
         @Override
         protected void onPreExecute() {
             this.dialog1.setCanceledOnTouchOutside(false);
@@ -243,10 +268,15 @@ public class ConsumerListActivity extends AppCompatActivity {
                     text_no_data_found.setVisibility(View.VISIBLE);
                 }
             }else{
-                alertDialog.setTitle("MRU Downloaded");
-                alertDialog.setMessage(" MRU not Downloaded !");
-                alertDialog.setButton("OK", (dialog, which) -> alertDialog.dismiss());
-                alertDialog.show();
+                UserInfo2 userInfo2=CommonPref.getUserDetails(ConsumerListActivity.this);
+                if(userInfo2.getUserID().startsWith("1") && this.conId!=null){
+                    loadSmartConsumerDetails(this.conId);
+                }else {
+                    alertDialog.setTitle("MRU Downloaded");
+                    alertDialog.setMessage(" MRU not Downloaded !");
+                    alertDialog.setButton("OK", (dialog, which) -> alertDialog.dismiss());
+                    alertDialog.show();
+                }
             }
             if (this.dialog1.isShowing()) this.dialog1.cancel();
         }
@@ -261,6 +291,91 @@ public class ConsumerListActivity extends AppCompatActivity {
         encString=encString.replaceAll("\\/","SSLASH").replaceAll("\\=","EEQUAL").replaceAll("\\+","PPLUS");
         return encString;
     }
+
+    //newly added feature for smart meter serch
+    private void loadSmartConsumerDetails(final String SmartConsumerId) {
+       progressDialog = new ProgressDialog(ConsumerListActivity.this);
+        apiInterface = APIClient.getClient(com.bih.nic.e_wallet.retrofit.Urls_this_pro.RETROFIT_BASE_URL3).create(APIInterface.class);
+        Call<SmartConsumerDetail> call1 = apiInterface.getRuralConsumerDetails(SmartConsumerId);
+        progressDialog = new ProgressDialog(ConsumerListActivity.this);
+        progressDialog.setMessage("Loading Consumer NB Consumer Details");
+        progressDialog.setCancelable(false);
+        progressDialog.show();
+        call1.enqueue(new Callback<SmartConsumerDetail>() {
+            @Override
+            public void onResponse(Call<SmartConsumerDetail> call, Response<SmartConsumerDetail> response) {
+                if (progressDialog.isShowing()) progressDialog.dismiss();
+                SmartConsumerDetail result = null;
+                if (response.body() != null) result = response.body();
+                if (result != null) {
+                    MRUEntity mruEntity = getMRUOBJFromSMCD(result);
+                    List<BookNoEntity> bookNoEntities = new DataBaseHelper(ConsumerListActivity.this).getBookNo(CommonPref.getUserDetails(ConsumerListActivity.this).getUserID());
+                    int count=0;
+                    for(BookNoEntity bookNoEntity: bookNoEntities){
+                        if (bookNoEntity.getBookNo().equals(mruEntity)) {
+                            count++;
+                            break;
+                        };
+                    }
+                    if (count>0) {
+                        List<MRUEntity> mruEntities = Arrays.asList(mruEntity);
+                        long c = new DataBaseHelper(ConsumerListActivity.this).saveMru(mruEntities, CommonPref.getUserDetails(ConsumerListActivity.this).getUserID());
+                        if (c > 0) {
+                            recycler_list_consumer.setVisibility(View.VISIBLE);
+                            text_no_data_found.setVisibility(View.GONE);
+                            consumerItemAdapter = new ConsumerItemAdapter(mruEntities, ConsumerListActivity.this);
+                            RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(ConsumerListActivity.this);
+                            recycler_list_consumer.setLayoutManager(mLayoutManager);
+                            recycler_list_consumer.setItemAnimator(new DefaultItemAnimator());
+                            recycler_list_consumer.setAdapter(consumerItemAdapter);
+                        } else {
+                            recycler_list_consumer.setVisibility(View.GONE);
+                            text_no_data_found.setVisibility(View.VISIBLE);
+                        }
+                    }else{
+                        recycler_list_consumer.setVisibility(View.GONE);
+                        text_no_data_found.setText("Book is not found !");
+                        text_no_data_found.setVisibility(View.VISIBLE);
+                    }
+                } else {
+                    recycler_list_consumer.setVisibility(View.GONE);
+                    text_no_data_found.setVisibility(View.VISIBLE);
+                }
+
+            }
+            @Override
+            public void onFailure(Call<SmartConsumerDetail> call, Throwable t) {
+                UserInfo2 userInfo2 = CommonPref.getUserDetails(ConsumerListActivity.this);
+               // mruLoader = (PayDetailsActivity.MRULoader) new PayDetailsActivity.MRULoader().execute(userInfo2.getUserID() + "|" + userInfo2.getPassword() + "|" + userInfo2.getImeiNo() + "|" + userInfo2.getImeiNo() + "|NA|" + mruEntity.getCON_ID().trim() + "|NA");
+                Log.e("error", t.getMessage());
+                t.printStackTrace();
+                //Toast.makeText(ConsumerListActivity.this, "" + t.getMessage(), Toast.LENGTH_SHORT).show();
+                if (progressDialog.isShowing()) progressDialog.dismiss();
+                call.cancel();
+            }
+        });
+    }
+
+    private MRUEntity getMRUOBJFromSMCD(SmartConsumerDetail smartConsumerDetail) {
+        MRUEntity mruEntity2=new MRUEntity();
+        mruEntity2.setMETER_TYPE((smartConsumerDetail.getMeterType().equals("SMART_PREPAID")||smartConsumerDetail.getMeterType().equals("SMART_POSTPAID"))?"PREPAID":"POSTPAID");
+        mruEntity2.setACT_NO(smartConsumerDetail.getActNo());
+        mruEntity2.setCNAME(smartConsumerDetail.getComName());
+        mruEntity2.setBILL_NO(smartConsumerDetail.getBillNo());
+        mruEntity2.setBOOK_NO(smartConsumerDetail.getBookNo());
+        mruEntity2.setCON_ID(smartConsumerDetail.getConId());
+        mruEntity2.setOLD_CON_ID(smartConsumerDetail.getOldConId());
+        mruEntity2.setBILL_ADDR1(smartConsumerDetail.getAddress());
+        mruEntity2.setFA_HU_NAME(smartConsumerDetail.getFatherName());
+        mruEntity2.setLAST_PAY_DATE(smartConsumerDetail.getPrevPaidDt());
+        mruEntity2.setPAYBLE_AMOUNT(smartConsumerDetail.getGrossAmt());
+        mruEntity2.setMOBILE_NO(smartConsumerDetail.getMobNo());
+        mruEntity2.setMETER_NO(smartConsumerDetail.getMeterNo());
+        mruEntity2.setTARIFF_ID(smartConsumerDetail.getCategory());
+        mruEntity2.setSUB_DIV_ID(smartConsumerDetail.getSubDivId());
+        return mruEntity2;
+    }
+
 
 
 }

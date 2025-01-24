@@ -70,6 +70,28 @@ public class SmartConsumerDetail {
     @SerializedName("SUB_DIV_NAME")
     private String subDivName;
 
+    @SerializedName("BOOK_NO")
+    private String bookNo;
+
+    public String getOldConId() {
+        return oldConId;
+    }
+
+    public void setOldConId(String oldConId) {
+        this.oldConId = oldConId;
+    }
+
+    @SerializedName("OLD_CON_ID")
+    private String oldConId;
+
+    public String getBookNo() {
+        return bookNo;
+    }
+
+    public void setBookNo(String bookNo) {
+        this.bookNo = bookNo;
+    }
+
     public String getAddress() {
         return address;
     }

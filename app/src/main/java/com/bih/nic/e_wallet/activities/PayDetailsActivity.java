@@ -116,7 +116,10 @@ public class PayDetailsActivity extends AppCompatActivity implements View.OnClic
         }
         button_pay = findViewById(R.id.button_pay);
         check_smt_balance = findViewById(R.id.check_smt_balance);
-        if (mruEntity.getMETER_TYPE().equals("PREPAID")){
+        check_smt_balance.setVisibility(View.GONE);
+        UserInfo2 userInfo2 = CommonPref.getUserDetails(context);
+        //condition for NBPDCL
+        if (userInfo2.getUserID().startsWith("1") && mruEntity.getMETER_TYPE().equals("PREPAID")){
             check_smt_balance.setVisibility(View.VISIBLE);
             check_smt_balance.setOnClickListener(this);
         } else {
@@ -171,11 +174,11 @@ public class PayDetailsActivity extends AppCompatActivity implements View.OnClic
     protected void onResume() {
         super.onResume();
         UserInfo2 userInfo2 = CommonPref.getUserDetails(context);
-        if(userInfo2.getUserID().startsWith("2") && mruEntity.getMETER_TYPE().equals("PREPAID")){
+        if(Utiilties.isOnline(PayDetailsActivity.this) && userInfo2.getUserID().startsWith("1") && mruEntity.getMETER_TYPE().equals("PREPAID")){
             loadSmartConsumerDetails(mruEntity.getCON_ID());
         }
         else if (Utiilties.isOnline(PayDetailsActivity.this)) {
-            mruLoader = (MRULoader) new MRULoader().execute(userInfo2.getUserID() + "|" + userInfo2.getPassword() + "|" + userInfo2.getImeiNo() + "|" + userInfo2.getSerialNo() + "|NA|" + mruEntity.getCON_ID().trim() + "|NA");
+            mruLoader = (MRULoader) new MRULoader().execute(userInfo2.getUserID() + "|" + userInfo2.getPassword() + "|" + userInfo2.getImeiNo() + "|" + userInfo2.getImeiNo() + "|NA|" + mruEntity.getCON_ID().trim() + "|NA");
         } else {
             text_payable_amount.setText("Please connect to internet !");
             text_payable_amount.setTextColor(getResources().getColor(R.color.colorAccent));
@@ -259,7 +262,12 @@ public class PayDetailsActivity extends AppCompatActivity implements View.OnClic
                 //AlertDialogForPrinter();
                 UserInfo2 userInfo2 = CommonPref.getUserDetails(PayDetailsActivity.this);
                 if (Utiilties.isOnline(PayDetailsActivity.this)) {
-                    new MRULoader().execute(userInfo2.getUserID() + "|" + userInfo2.getPassword() + "|" + userInfo2.getImeiNo() + "|" + userInfo2.getSerialNo() + "|NA|" + mruEntity.getCON_ID().trim() + "|NA");
+                    if(userInfo2.getUserID().startsWith("1") && mruEntity.getMETER_TYPE().equals("PREPAID")){
+                        loadSmartConsumerDetails(mruEntity.getCON_ID());
+                    }
+                    else{
+                        mruLoader = (MRULoader) new MRULoader().execute(userInfo2.getUserID() + "|" + userInfo2.getPassword() + "|" + userInfo2.getImeiNo() + "|" + userInfo2.getImeiNo() + "|NA|" + mruEntity.getCON_ID().trim() + "|NA");
+                    }
                 } else {
                     text_payable_amount.setText("Please connect to internet !");
                     text_payable_amount.setTextColor(getResources().getColor(R.color.colorAccent));
@@ -282,10 +290,10 @@ public class PayDetailsActivity extends AppCompatActivity implements View.OnClic
         apiInterface = APIClient.getClient(com.bih.nic.e_wallet.retrofit.Urls_this_pro.RETROFIT_BASE_URL2).create(APIInterface.class);
         Call<SmartMeterDetail> call1 = apiInterface.getSmartMeterBalance(smartMeterBalanceRequest);
         progressDialog = new ProgressDialog(PayDetailsActivity.this);
-        progressDialog.setMessage("Loading...");
+        progressDialog.setMessage("Loading Smartmeter Balance....");
         progressDialog.setCancelable(false);
         progressDialog.show();
-        call1.enqueue(new Callback<>() {
+        call1.enqueue(new Callback<SmartMeterDetail>() {
             @Override
             public void onResponse(Call<SmartMeterDetail> call, Response<SmartMeterDetail> response) {
                 if (progressDialog.isShowing()) progressDialog.dismiss();
@@ -303,8 +311,7 @@ public class PayDetailsActivity extends AppCompatActivity implements View.OnClic
                     builder.setMessage("Details not found !")
                             .setPositiveButton(R.string.ok, (dialog, id) -> {
                                 // User cancels the dialog.
-                                dialog.dismiss();
-                            });
+                                dialog.dismiss();});
                 }
                 // Create the AlertDialog object and return it.
                 AlertDialog alert11 = builder.create();
@@ -323,13 +330,13 @@ public class PayDetailsActivity extends AppCompatActivity implements View.OnClic
     }
 
     private void loadSmartConsumerDetails(final String SmartConsumerId) {
-        apiInterface = APIClient.getClient(com.bih.nic.e_wallet.retrofit.Urls_this_pro.RETROFIT_BASE_URL2).create(APIInterface.class);
+        apiInterface = APIClient.getClient(com.bih.nic.e_wallet.retrofit.Urls_this_pro.RETROFIT_BASE_URL3).create(APIInterface.class);
         Call<SmartConsumerDetail> call1 = apiInterface.getRuralConsumerDetails(SmartConsumerId);
         progressDialog = new ProgressDialog(PayDetailsActivity.this);
-        progressDialog.setMessage("Loading...");
+        progressDialog.setMessage("Loading Consumer NB Consumer Details");
         progressDialog.setCancelable(false);
         progressDialog.show();
-        call1.enqueue(new Callback<>() {
+        call1.enqueue(new Callback<SmartConsumerDetail>() {
             @Override
             public void onResponse(Call<SmartConsumerDetail> call, Response<SmartConsumerDetail> response) {
                 if (progressDialog.isShowing()) progressDialog.dismiss();
@@ -338,21 +345,48 @@ public class PayDetailsActivity extends AppCompatActivity implements View.OnClic
                 AlertDialog.Builder builder = new AlertDialog.Builder(PayDetailsActivity.this);
                 builder.setTitle( mruEntity.getCON_ID());
                 if (result != null) {
-                        
+                    mruEntity = getMRUOBJFromSMCD(result);
+                    UserInfo2 userInfo2 = CommonPref.getUserDetails(context);
+                    if (userInfo2.getUserID().startsWith("1") && mruEntity.getMETER_TYPE().equals("PREPAID")){
+                        check_smt_balance.setVisibility(View.VISIBLE);
+                        check_smt_balance.setOnClickListener(PayDetailsActivity.this);
+                    } else {
+                        check_smt_balance.setVisibility(View.GONE);
+                    }
+                    text_payable_amount.setText("" + mruEntity.getPAYBLE_AMOUNT());
+                    text_payable_amount.setTextColor(getResources().getColor(R.color.holo_blue_dark));
+                    text_old_con_id.setText((mruEntity.getOLD_CON_ID()==null)?"N/A":mruEntity.getOLD_CON_ID());
+                    text_meter_no.setText((mruEntity.getMETER_NO()==null)?"N/A":mruEntity.getMETER_NO());
+                    text_address.setText("" + mruEntity.getBILL_ADDR1());
+                    text_book_no.setText("" + mruEntity.getBOOK_NO());
+                    /*if(mruEntity.getMOBILE_NO()==null){
+                        edit_mobile2.setEnabled(true);
+                        edit_mobile2.setText("");
+                    }else {
+                        edit_mobile2.setText("" + mruEntity.getMOBILE_NO());
+                    }*/
+                    edit_mobile2.setText("" + mruEntity.getMOBILE_NO());
+                    text_meter_type = findViewById(R.id.text_meter_type);
+                    mruEntity.setPAYBLE_AMOUNT(""+mruEntity.getPAYBLE_AMOUNT());
+                    balance_loader = (BalanceLoader) new BalanceLoader(PayDetailsActivity.this).execute(userInfo2.getUserID() + "|" + userInfo2.getPassword() + "|" + userInfo2.getImeiNo() + "|" + userInfo2.getImeiNo());
                 } else {
-                    builder.setMessage("Details not found !")
+                    UserInfo2 userInfo2 = CommonPref.getUserDetails(PayDetailsActivity.this);
+                    mruLoader = (MRULoader) new MRULoader().execute(userInfo2.getUserID() + "|" + userInfo2.getPassword() + "|" + userInfo2.getImeiNo() + "|" + userInfo2.getImeiNo() + "|NA|" + mruEntity.getCON_ID().trim() + "|NA");
+                    /*builder.setMessage("Details not found !")
                             .setPositiveButton(R.string.ok, (dialog, id) -> {
                                 // User cancels the dialog.
                                 dialog.dismiss();
-                            });
+                            });*/
                 }
                 // Create the AlertDialog object and return it.
-                AlertDialog alert11 = builder.create();
-                alert11.show();
+                //AlertDialog alert11 = builder.create();
+                //alert11.show();
             }
 
             @Override
             public void onFailure(Call<SmartConsumerDetail> call, Throwable t) {
+                UserInfo2 userInfo2 = CommonPref.getUserDetails(PayDetailsActivity.this);
+                mruLoader = (MRULoader) new MRULoader().execute(userInfo2.getUserID() + "|" + userInfo2.getPassword() + "|" + userInfo2.getImeiNo() + "|" + userInfo2.getImeiNo() + "|NA|" + mruEntity.getCON_ID().trim() + "|NA");
                 Log.e("error", t.getMessage());
                 t.printStackTrace();
                 Toast.makeText(PayDetailsActivity.this, "" + t.getMessage(), Toast.LENGTH_SHORT).show();
@@ -361,6 +395,27 @@ public class PayDetailsActivity extends AppCompatActivity implements View.OnClic
             }
         });
     }
+
+    private MRUEntity getMRUOBJFromSMCD(SmartConsumerDetail smartConsumerDetail) {
+        MRUEntity mruEntity2=new MRUEntity();
+        mruEntity2.setMETER_TYPE((smartConsumerDetail.getMeterType().equals("SMART_PREPAID")||smartConsumerDetail.getMeterType().equals("SMART_POSTPAID"))?"PREPAID":"POSTPAID");
+        mruEntity2.setACT_NO(smartConsumerDetail.getActNo());
+        mruEntity2.setCNAME(smartConsumerDetail.getComName());
+        mruEntity2.setBILL_NO(smartConsumerDetail.getBillNo());
+        mruEntity2.setBOOK_NO(smartConsumerDetail.getBookNo());
+        mruEntity2.setCON_ID(smartConsumerDetail.getConId());
+        mruEntity2.setOLD_CON_ID(smartConsumerDetail.getOldConId());
+        mruEntity2.setBILL_ADDR1(smartConsumerDetail.getAddress());
+        mruEntity2.setFA_HU_NAME(smartConsumerDetail.getFatherName());
+        mruEntity2.setLAST_PAY_DATE(smartConsumerDetail.getPrevPaidDt());
+        mruEntity2.setPAYBLE_AMOUNT(smartConsumerDetail.getGrossAmt());
+        mruEntity2.setMOBILE_NO(smartConsumerDetail.getMobNo());
+        mruEntity2.setMETER_NO(smartConsumerDetail.getMeterNo());
+        mruEntity2.setTARIFF_ID(smartConsumerDetail.getCategory());
+        mruEntity2.setSUB_DIV_ID(smartConsumerDetail.getSubDivId());
+        return mruEntity2;
+    }
+
     public void AlertDialogForCheckDetails(final MRUEntity mruEntity1) {
         final Dialog dialog = new Dialog(PayDetailsActivity.this);
         /*	dialog.requestWindowFeature(Window.FEATURE_NO_TITLE); //before*/
@@ -435,13 +490,20 @@ public class PayDetailsActivity extends AppCompatActivity implements View.OnClic
     }
 
     private void payForPrepaid(MRUEntity mruEntity1, final TextView check_con_pay, Animation fade_in) {
+        UserInfo2 userInfo2 = CommonPref.getUserDetails(context);
         double paying_amt = ((Double.parseDouble(mruEntity1.getPAYBLE_AMOUNT()) * 5) > 10000) ? (Double.parseDouble(mruEntity1.getPAYBLE_AMOUNT()) * 5) : 10000;
         Log.e("paying_amt", String.valueOf(paying_amt));
-        if (Double.parseDouble(edit_payable_amount.getText().toString()) > paying_amt) {
+        if (Double.parseDouble(edit_payable_amount.getText().toString()) <= 0) {
+            check_con_pay.setVisibility(View.VISIBLE);
+            check_con_pay.setText(" You can't pay Rs. " + edit_payable_amount.getText().toString());
+            check_con_pay.startAnimation(fade_in);
+        }
+        else if (userInfo2.getUserID().startsWith("2") && Double.parseDouble(edit_payable_amount.getText().toString()) > paying_amt) {
             check_con_pay.setVisibility(View.VISIBLE);
             check_con_pay.setText(" You can't pay more than Rs. " + paying_amt);
             check_con_pay.startAnimation(fade_in);
-        } else {
+        }
+        else {
             navigationIntent(mruEntity1);
         }
     }
@@ -820,3 +882,5 @@ public class PayDetailsActivity extends AppCompatActivity implements View.OnClic
         }
     }
 }
+
+

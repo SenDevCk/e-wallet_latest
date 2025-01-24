@@ -469,12 +469,7 @@ public class PinCodeActivity extends AppCompatActivity implements View.OnClickLi
                     } else {
                         //new DataBaseHelper(PinCodeActivity.this).deleteRequestedPayment(mruEntity.getCON_ID(),amount);
                        alertDialog.setMessage(""+jsonObject.getString("MESSAGE_STRING"));
-                       alertDialog.setButton("OK", new DialogInterface.OnClickListener() {
-                           @Override
-                           public void onClick(DialogInterface dialogInterface, int i) {
-                               dialogInterface.dismiss();
-                           }
-                       });
+                       alertDialog.setButton("OK", (dialogInterface, i) -> dialogInterface.dismiss());
                        alertDialog.show();
                      if (jsonObject.getString("transStatus").equals("TP") || jsonObject.getString("transStatus").equals("TI")){
                         if (jsonObject.getString("TRANS_ID").trim()!=null) {
