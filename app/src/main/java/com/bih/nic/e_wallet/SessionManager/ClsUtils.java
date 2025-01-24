@@ -1,13 +1,8 @@
 package com.bih.nic.e_wallet.SessionManager;
 
-import android.Manifest;
-import android.bluetooth.BluetoothAdapter;
+
 import android.bluetooth.BluetoothDevice;
-import android.content.pm.PackageManager;
 import android.util.Log;
-
-import androidx.core.app.ActivityCompat;
-
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 

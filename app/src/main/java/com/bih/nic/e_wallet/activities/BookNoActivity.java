@@ -13,7 +13,7 @@ import com.bih.nic.e_wallet.adapters.BookNoAdapter;
 
 
 /**
- * Created by NIC2 on 1/16/2018.
+ * Created by Chandan on 1/16/2018.
  */
 public class BookNoActivity extends AppCompatActivity {
     ListView book_list;

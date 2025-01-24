@@ -23,7 +23,7 @@ public interface Urls_this_pro{
     public static final String GET_COMPLAIN_LiST = BASEURL+"complaintList?reqStr=";
     public static final String GET_VALIDATE_OTP   = BASEURL+"firstOTP?reqStr=";
     public static final String GET_UNBUILED_CONSUMER= BASEURL+"unpaidList?reqStr=";
-    //local now 1.6.61.111
+    //staging now 1.6.61.111
     /* public static final String BASEURL="http://192.168.139.61/ewallet/api/nic/";
      public static final String EWALLET_OUIRY_VERSION = BASEURL+"appVer?reqStr=";
     public static final String LOG_IN_URL = BASEURL+"vendorLogin?reqStr=";

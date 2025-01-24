@@ -32,7 +32,7 @@ public class ConfigurePrinterActivity extends AppCompatActivity implements View.
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_configure_printer);
-        toolbar_con_printer=(Toolbar)findViewById(R.id.toolbar_con_printer);
+        toolbar_con_printer=findViewById(R.id.toolbar_con_printer);
         toolbar_con_printer.setTitle("Printer List");
         setSupportActionBar(toolbar_con_printer);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);

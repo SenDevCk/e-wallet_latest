@@ -21,7 +21,14 @@
             app:layout_scrollFlags="scroll|enterAlways"
             app:popupTheme="@style/AppTheme" />
     </com.google.android.material.appbar.AppBarLayout>
-
+    <TextView
+        android:id="@+id/text_no_data"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="No data found !"
+        android:textColor="@color/red"
+        android:gravity="center"
+        android:layout_below="@+id/app_bar_gri_list"/>
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
         android:id="@+id/pullToRefresh"
         android:layout_width="match_parent"

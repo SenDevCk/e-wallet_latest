@@ -26,7 +26,7 @@
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/button_pay"
+        android:layout_above="@+id/ll_buttons"
         android:layout_below="@+id/app_bar_lay_profile">
 
         <LinearLayout
@@ -66,7 +66,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:padding="5dp"
-                        android:text="Name:Chandan Singh"
+                        android:text="##########$$$"
                         android:textColor="@color/colorPrimary"
                         android:textStyle="bold" />
 
@@ -75,7 +75,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:padding="5dp"
-                        android:text="A/c-155400121332"
+                        android:text="A/c-..............."
                         android:textColor="@android:color/black"
                         android:textStyle="bold" />
 
@@ -84,7 +84,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:padding="5dp"
-                        android:text="Nand Kumar Singh , itawan , Saran , Bihar" />
+                        android:text="********* , ****** , ***** , *****" />
                 </LinearLayout>
             </LinearLayout>
 
@@ -131,7 +131,7 @@
                         android:layout_gravity="center_vertical"
                         android:layout_weight=".6"
                         android:gravity="center_vertical"
-                        android:hint="2161020934"
+                        android:hint="*********"
                         android:textSize="16sp" />
                 </LinearLayout>
 
@@ -155,7 +155,7 @@
                         android:layout_gravity="center_vertical"
                         android:layout_weight=".6"
                         android:gravity="center_vertical"
-                        android:hint="cha@gmail.com"
+                        android:hint="*****@gmail.com"
                         android:textSize="16sp" />
                 </LinearLayout>
 
@@ -179,7 +179,7 @@
                         android:layout_gravity="center_vertical"
                         android:layout_weight=".6"
                         android:gravity="center_vertical"
-                        android:hint="..."
+                        android:hint="...****....."
                         android:textColor="@android:color/holo_green_dark"
                         android:textSize="16sp"
                         android:textStyle="bold" />
@@ -203,21 +203,13 @@
                         android:layout_weight=".6"
                         android:orientation="vertical">
 
-                        <TextView
-
-                            android:layout_width="wrap_content"
-                            android:layout_height="40dp"
-                            android:layout_gravity="center_vertical"
-                            android:gravity="center_vertical"
-                            android:hint="9800211112"
-                            android:textSize="16sp"
-                            android:visibility="gone" />
-
                         <EditText
                             android:id="@+id/edit_mobile2"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:hint="enter mobile number"
+                            android:minWidth="48dp"
+                            android:minHeight="48dp"
+                            android:hint="enter consumer mobile no."
                             android:inputType="phone"
                             android:maxLength="10"
                             android:singleLine="true" />
@@ -244,7 +236,7 @@
                         android:layout_gravity="center_vertical"
                         android:layout_weight=".6"
                         android:gravity="center_vertical"
-                        android:hint="9800211112"
+                        android:hint="**********"
                         android:textSize="16sp" />
                 </LinearLayout>
 
@@ -268,7 +260,7 @@
                         android:layout_gravity="center_vertical"
                         android:layout_weight=".6"
                         android:gravity="center_vertical"
-                        android:hint="ADHPA"
+                        android:hint="*******"
                         android:textSize="16sp" />
 
                 </LinearLayout>
@@ -337,8 +329,10 @@
 
             <CheckBox
                 android:id="@+id/check_term"
-                android:layout_width="wrap_content"
-                android:layout_height="37dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minWidth="48dp"
+                android:minHeight="48dp"
                 android:layout_marginTop="10dp"
                 android:text="I agree to be all above details are correct." />
 
@@ -365,6 +359,7 @@
         </LinearLayout>
     </ScrollView>
     <LinearLayout
+        android:id="@+id/ll_buttons"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true">
@@ -378,6 +373,7 @@
             android:textColor="@color/colorWhite"
             android:paddingLeft="5dp"
             android:paddingRight="5dp"
+            android:visibility="gone"
             android:text="Fetch Smart Meter Balance"/>
         <Button
             android:id="@+id/button_pay"

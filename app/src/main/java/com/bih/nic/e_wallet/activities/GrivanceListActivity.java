@@ -1,7 +1,9 @@
 package com.bih.nic.e_wallet.activities;
 
 import android.os.Bundle;
+import android.view.View;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -21,6 +23,7 @@ public class GrivanceListActivity extends AppCompatActivity {
     ListView list_Grivance_Itm;
     ArrayList<GrivanceEntity> grivanceEntities;
     Toolbar toolbar;
+    TextView text_no_data;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -31,6 +34,9 @@ public class GrivanceListActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
+        list_Grivance_Itm =  findViewById(R.id.list_Grivance_Itm);
+        text_no_data =  findViewById(R.id.text_no_data);
+        text_no_data.setVisibility(View.GONE);
         loadpageData();
         swipeRefreshLayout =  findViewById(R.id.pullToRefresh);
         swipeRefreshLayout.setOnRefreshListener(() -> {
@@ -44,7 +50,6 @@ public class GrivanceListActivity extends AppCompatActivity {
         return true;
     }
     private void loadpageData() {
-        list_Grivance_Itm =  findViewById(R.id.list_Grivance_Itm);
         GrievanceListService.grievanceListBinderMethod(new GrivanceListBinder() {
             @Override
             public void grivanceFound(ArrayList<GrivanceEntity> grivanceEntityArrayList) {
@@ -54,6 +59,8 @@ public class GrivanceListActivity extends AppCompatActivity {
                         grivanceEntities = grivanceEntityArrayList;
                         grivanceListAdapter = new GrivanceListAdapter(GrivanceListActivity.this, grivanceEntityArrayList);
                         list_Grivance_Itm.setAdapter(grivanceListAdapter);
+                    }else {
+                        text_no_data.setVisibility(View.VISIBLE);
                     }
                 }
             }
@@ -61,6 +68,7 @@ public class GrivanceListActivity extends AppCompatActivity {
             @Override
             public void grivanceNotFound(String response) {
                 if (grivanceEntities != null) {
+                    text_no_data.setVisibility(View.VISIBLE);
                     grivanceEntities.clear();
                     grivanceListAdapter.notify();
                     Toast.makeText(GrivanceListActivity.this, "" + response, Toast.LENGTH_SHORT).show();

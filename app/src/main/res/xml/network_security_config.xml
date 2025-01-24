@@ -4,5 +4,7 @@
        <domain includeSubdomains="true">energypayment.bsphcl.co.in</domain>
         <domain includeSubdomains="true">192.168.139.61</domain>
         <domain includeSubdomains="true">energyservices.bsphcl.co.in</domain>
+        <domain includeSubdomains="true">energysmart.bsphcl.co.in</domain>
+        <domain includeSubdomains="true">125.16.220.29</domain>
     </domain-config>
 </network-security-config>

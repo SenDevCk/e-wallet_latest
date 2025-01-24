@@ -9,7 +9,6 @@ import com.bih.nic.e_wallet.retrofitPoso.SmartMeterDetail;
 
 import retrofit2.Call;
 import retrofit2.http.Body;
-import retrofit2.http.Field;
 import retrofit2.http.GET;
 import retrofit2.http.POST;
 import retrofit2.http.Query;
@@ -32,7 +31,7 @@ public interface APIInterface {
      @POST("/secureV05/webapi/myresource/smartStatus")
     Call<SmartMeterDetail> getSmartMeterBalance(@Body SmartMeterBalanceRequest smartMeterBalanceRequest);
 
-    @GET("/webapi/myresource/getConsDetailsForOnlinePayment?")
+    @GET("/servicesNB/webapi/myresource/getConsDetailsForOnlinePayment?")
     Call<SmartConsumerDetail> getRuralConsumerDetails(@Query("ConsumerId") String ConsumerId);
 
 

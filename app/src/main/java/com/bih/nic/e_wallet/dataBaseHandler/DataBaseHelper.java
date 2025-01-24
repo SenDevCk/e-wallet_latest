@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by NIC2 on 1/6/2018.
@@ -224,7 +225,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS UNBILLEDCONSUMER");
     }
 
-    public long saveMru(ArrayList<MRUEntity> mruEntities, String userid) {
+    public long saveMru(List<MRUEntity> mruEntities, String userid) {
         long c = -1;
         SQLiteDatabase db = this.getWritableDatabase();
         try {
@@ -385,7 +386,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         try {
             SQLiteDatabase db = this.getReadableDatabase();
             String quary = "select * from BookNo where USER_ID=?";
-            Cursor cursor = db.rawQuery(quary, new String[]{userid});
+            Cursor cursor = db.rawQuery(quary, new String[]{userid.trim()});
             while (cursor.moveToNext()) {
                 BookNoEntity bookNoEntity = new BookNoEntity();
                 bookNoEntity.setBookNo(cursor.getString(cursor.getColumnIndex("BookNo")));

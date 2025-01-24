@@ -91,6 +91,8 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     private AlertDialog alertDialog = null;
     OtpView otp_view;
 
+    int counter=0;
+
     @RequiresApi(api = Build.VERSION_CODES.S)
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -177,8 +179,8 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 dialog1.dismiss();
                 //if(smsVerificationService!=null && smsVerificationService.getStatus()!=SmsVerificationService.Status.RUNNING) {
                 if(!messageText.isEmpty()) {
-                    //smsVerificationService = (SmsVerificationService) new SmsVerificationService(LoginActivity.this, imei, serial_id).execute(edit_user_name.getText().toString().trim() + "|" + imei.trim() + "|" + messageText.split(" ")[0].trim());
-                    smsVerification(reqString(edit_user_name.getText().toString().trim() + "|" + imei.trim() + "|" + otp_view.getOTP()));
+                        //smsVerification(reqString(edit_user_name.getText().toString().trim() + "|" + imei.trim() + "|" + messageText.split(" ")[0].trim()));
+                        smsVerificationService = (SmsVerificationService) new SmsVerificationService(LoginActivity.this, imei, serial_id).execute(edit_user_name.getText().toString().trim() + "|" + imei.trim() + "|" + messageText.split(" ")[0].trim());
                 }else {
                     System.err.println("SmsReceiver.bindListener Empty message received !");
                     Toast.makeText(this, "Empty message received !"+messageText, Toast.LENGTH_SHORT).show();
@@ -186,7 +188,10 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 //}
             });
             //new LoginLoader(LoginActivity.this,imei,serial_id).execute(edit_user_name.getText().toString() + "|" + edit_pass.getText().toString() + "|" + imei + "|" + serial_id);
-            loginUsingRetrofit(reqString(edit_user_name.getText().toString() + "|" + edit_pass.getText().toString() + "|" + imei + "|" + serial_id));
+           if (counter==0) {
+               counter++;
+               loginUsingRetrofit(reqString(edit_user_name.getText().toString() + "|" + edit_pass.getText().toString() + "|" + imei + "|" + serial_id));
+           }
         }
 
     }
@@ -200,7 +205,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         progressDialog.setMessage("Loading...");
         progressDialog.setCancelable(false);
         progressDialog.show();
-        call1.enqueue(new Callback<>() {
+        call1.enqueue(new Callback<UserInfo2>() {
             @Override
             public void onResponse(Call<UserInfo2> call, Response<UserInfo2> response) {
                 if (progressDialog.isShowing()) progressDialog.dismiss();
@@ -209,7 +214,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 if (result == null) {
                     button_login.setEnabled(true);
                     alertDialog.setTitle("Login Unsuccessful");
-                    alertDialog.setMessage("Server not responding");
+                    alertDialog.setMessage("Try after some time !");
                     alertDialog.setButton("OK", (dialog, which) -> {
                         //edit_user_name.setFocusable(true);
                     });
@@ -317,7 +322,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         progressDialog.setMessage("Verifying...");
         progressDialog.setCancelable(false);
         progressDialog.show();
-        call1.enqueue(new Callback<>() {
+        call1.enqueue(new Callback<String>() {
             @Override
             public void onResponse(Call<String> call, Response<String> response) {
                 if (progressDialog.isShowing()) progressDialog.dismiss();
@@ -517,3 +522,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         }
     }
 }
+
+
+

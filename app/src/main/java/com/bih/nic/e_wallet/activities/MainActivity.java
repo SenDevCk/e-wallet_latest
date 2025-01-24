@@ -228,7 +228,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         if (id == R.id.drawer_tkc) {
             dialogNeft();
-
         } else if (id == R.id.drawer_topup) {
             dialogReport(1);
         } else if (id == R.id.drawer_server_report) {
@@ -671,7 +670,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             setup_dialog.dismiss();
             if (Utiilties.isOnline(MainActivity.this)) {
                 UserInfo2 userInfo2 = CommonPref.getUserDetails(MainActivity.this);
-                new MRUAlocatar(MainActivity.this, true).execute(userInfo2.getUserID() + "|" + userInfo2.getPassword() + "|" + userInfo2.getImeiNo() + "|" + userInfo2.getSerialNo());
+                new MRUAlocatar(MainActivity.this, true).execute(userInfo2.getUserID() + "|" + userInfo2.getPassword() + "|" + userInfo2.getImeiNo() + "|" + userInfo2.getImeiNo());
             } else {
                 Toast.makeText(MainActivity.this, "No Internet Connection !", Toast.LENGTH_SHORT).show();
             }
@@ -858,7 +857,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         progressDialog.setMessage("Loading...");
         progressDialog.setCancelable(false);
         progressDialog.show();
-        call1.enqueue(new Callback<>() {
+        call1.enqueue(new Callback<SmartMeterDetail>() {
             @Override
             public void onResponse(Call<SmartMeterDetail> call, Response<SmartMeterDetail> response) {
                 if (progressDialog.isShowing()) progressDialog.dismiss();

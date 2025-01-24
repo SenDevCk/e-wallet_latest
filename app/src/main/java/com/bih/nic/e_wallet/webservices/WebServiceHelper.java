@@ -292,7 +292,7 @@ public class WebServiceHelper {
                 bookNoEntity.setBOOK_NO(jsonObject.getString("BOOK_NO"));
                 bookNoEntity.setBILL_ADDR1(jsonObject.getString("ADDRESS"));
                 bookNoEntity.setLAST_PAY_DATE(jsonObject.getString("LAST_PAY_DATE"));
-                    mruEntities.add(bookNoEntity);
+                mruEntities.add(bookNoEntity);
             }
         } catch (Exception e) {
             e.printStackTrace();
