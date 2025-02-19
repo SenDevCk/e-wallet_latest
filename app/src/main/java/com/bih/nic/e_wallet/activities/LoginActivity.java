@@ -14,9 +14,11 @@ import android.database.SQLException;
 import android.graphics.Typeface;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.os.Debug;
 import android.provider.Telephony;
 import android.telephony.TelephonyManager;
+import android.text.Html;
 import android.text.method.HideReturnsTransformationMethod;
 import android.text.method.PasswordTransformationMethod;
 import android.util.Base64;
@@ -90,6 +92,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     ProgressDialog progressDialog;
     private AlertDialog alertDialog = null;
     OtpView otp_view;
+    CountDownTimer countDownTimer;
 
     int counter=0;
 
@@ -225,9 +228,25 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                         AlertDialogForCheckDetails(true);
                     } else if (result.getMessageString().contains("AUTO")) {
                         //AlertDialogForCheckDetails(false);
-                        dialog1.setCancelable(false);
-                        dialog1.setMessage("Waiting for SMS...");
-                        dialog1.show();
+//                        dialog1.setCancelable(false);
+//                        dialog1.setMessage("Waiting for SMS...");
+//                        dialog1.show();
+                        countDownTimer = new CountDownTimer(30000, 1000) {
+
+                            public void onTick(long millisUntilFinished) {
+                                long seconds=millisUntilFinished / 1000;
+                                dialog1.setCanceledOnTouchOutside(false);
+                                dialog1.setMessage("Waiting For Otp for 30 seconds... remaining"+(seconds));
+                                dialog1.show();
+                                //here you can have your logic to set text to edittext
+                            }
+
+                            public void onFinish() {
+                                dialog1.dismiss();
+                                AlertDialogForOTP();
+                            }
+
+                        }.start();
                     } else {
                         String version1 = "App Version : " + version + " ( " + imei + " )";
                         ((TextView) findViewById(R.id.text_ver)).setText(version1);
@@ -520,6 +539,48 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 }
                 break;
         }
+    }
+
+    public void AlertDialogForOTP() {
+        final Dialog dialogOtp = new Dialog(LoginActivity.this);
+        /*	dialog.requestWindowFeature(Window.FEATURE_NO_TITLE); //before*/
+        dialogOtp.setContentView(R.layout.otp_dialog);
+        // set the custom dialogOtp components - text, image and button
+        //final EditText otpEdit = (EditText) dialogOtp.findViewById(R.id.enter_otp);
+        final EditText otp_view = (EditText) dialogOtp.findViewById(R.id.otp_view);
+        final Button button_submit = (Button) dialogOtp.findViewById(R.id.button_submit);
+        final TextView text_timer = (TextView) dialogOtp.findViewById(R.id.text_timer);
+        countDownTimer = new CountDownTimer(60000, 1000) {
+            public void onTick(long millisUntilFinished) {
+                long secs= millisUntilFinished / 1000;
+                text_timer.setVisibility(View.VISIBLE);
+                text_timer.setText(Html.fromHtml("<b style=\"color:White;\">" + (secs) + "</b> "));
+                text_timer.setTextColor(getResources().getColor(android.R.color.holo_blue_dark));
+                //here you can have your logic to set text to edittext
+            }
+
+            public void onFinish() {
+                text_timer.setVisibility(View.GONE);
+                dialogOtp.dismiss();
+            }
+
+        }.start();
+        // if button is clicked, close the custom dialogOtp
+        SmsReceiver.bindListener(messageText -> {
+            //Log.d("activity",""+messageText);
+            otp_view.setText(messageText.split(" ")[0].trim());
+        });
+        button_submit.setOnClickListener(v -> {
+            if (otp_view.getText().length() < 6) {
+                Toast.makeText(LoginActivity.this, "Enter Valid OTP !", Toast.LENGTH_SHORT).show();
+            } else {
+                button_submit.setClickable(false);
+                dialogOtp.dismiss();
+                new SmsVerificationService(LoginActivity.this, imei, imei).execute(otp_view.getText().toString().trim());
+            }
+
+        });
+        dialogOtp.show();
     }
 }
 

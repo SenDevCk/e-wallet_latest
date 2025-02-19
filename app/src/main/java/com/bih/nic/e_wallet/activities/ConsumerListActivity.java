@@ -298,7 +298,7 @@ public class ConsumerListActivity extends AppCompatActivity {
         apiInterface = APIClient.getClient(com.bih.nic.e_wallet.retrofit.Urls_this_pro.RETROFIT_BASE_URL3).create(APIInterface.class);
         Call<SmartConsumerDetail> call1 = apiInterface.getRuralConsumerDetails(SmartConsumerId);
         progressDialog = new ProgressDialog(ConsumerListActivity.this);
-        progressDialog.setMessage("Loading Consumer NB Consumer Details");
+        progressDialog.setMessage("Loading NB Smart Meter Consumer Details");
         progressDialog.setCancelable(false);
         progressDialog.show();
         call1.enqueue(new Callback<SmartConsumerDetail>() {
@@ -312,7 +312,7 @@ public class ConsumerListActivity extends AppCompatActivity {
                     List<BookNoEntity> bookNoEntities = new DataBaseHelper(ConsumerListActivity.this).getBookNo(CommonPref.getUserDetails(ConsumerListActivity.this).getUserID());
                     int count=0;
                     for(BookNoEntity bookNoEntity: bookNoEntities){
-                        if (bookNoEntity.getBookNo().equals(mruEntity)) {
+                        if (bookNoEntity.getBookNo().equals(mruEntity.getBOOK_NO()) && mruEntity.getMETER_TYPE().equals("PREPAID")) {
                             count++;
                             break;
                         };
@@ -334,7 +334,7 @@ public class ConsumerListActivity extends AppCompatActivity {
                         }
                     }else{
                         recycler_list_consumer.setVisibility(View.GONE);
-                        text_no_data_found.setText("Book is not found !");
+                        text_no_data_found.setText("Book is not available or not Smart_Prepaid !");
                         text_no_data_found.setVisibility(View.VISIBLE);
                     }
                 } else {

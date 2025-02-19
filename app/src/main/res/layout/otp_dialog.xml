@@ -33,7 +33,13 @@
             android:textColor="@color/colorAccent"
             app:otp=""
             app:text_background_color="@color/colorGray"></com.mukesh.OtpView>
-
+        <TextView
+            android:id="@+id/text_timer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="5dp"
+            android:text="0 secs"
+            android:visibility="gone" />
         <Button
         android:id="@+id/verify"
         android:layout_width="170dip"

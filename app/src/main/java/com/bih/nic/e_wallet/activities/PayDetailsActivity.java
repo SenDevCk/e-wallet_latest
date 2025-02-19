@@ -174,7 +174,8 @@ public class PayDetailsActivity extends AppCompatActivity implements View.OnClic
     protected void onResume() {
         super.onResume();
         UserInfo2 userInfo2 = CommonPref.getUserDetails(context);
-        if(Utiilties.isOnline(PayDetailsActivity.this) && userInfo2.getUserID().startsWith("1") && mruEntity.getMETER_TYPE().equals("PREPAID")){
+        //&& mruEntity.getMETER_TYPE().equals("PREPAID")
+        if(Utiilties.isOnline(PayDetailsActivity.this) && userInfo2.getUserID().startsWith("1")){
             loadSmartConsumerDetails(mruEntity.getCON_ID());
         }
         else if (Utiilties.isOnline(PayDetailsActivity.this)) {
