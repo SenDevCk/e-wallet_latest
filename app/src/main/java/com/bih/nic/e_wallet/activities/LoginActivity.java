@@ -236,7 +236,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                             public void onTick(long millisUntilFinished) {
                                 long seconds=millisUntilFinished / 1000;
                                 dialog1.setCanceledOnTouchOutside(false);
-                                dialog1.setMessage("Waiting For Otp for 30 seconds... remaining"+(seconds));
+                                dialog1.setMessage("Waiting For Otp for 30 seconds... remaining "+seconds+" seconds" );
                                 dialog1.show();
                                 //here you can have your logic to set text to edittext
                             }
@@ -547,8 +547,10 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         dialogOtp.setContentView(R.layout.otp_dialog);
         // set the custom dialogOtp components - text, image and button
         //final EditText otpEdit = (EditText) dialogOtp.findViewById(R.id.enter_otp);
-        final EditText otp_view = (EditText) dialogOtp.findViewById(R.id.otp_view);
-        final Button button_submit = (Button) dialogOtp.findViewById(R.id.button_submit);
+        final OtpView otp_view = (OtpView) dialogOtp.findViewById(R.id.otp_view);
+        final Button button_submit = (Button) dialogOtp.findViewById(R.id.verify);
+        final Button go_to_home = (Button) dialogOtp.findViewById(R.id.go_to_home);
+        go_to_home.setVisibility(View.GONE);
         final TextView text_timer = (TextView) dialogOtp.findViewById(R.id.text_timer);
         countDownTimer = new CountDownTimer(60000, 1000) {
             public void onTick(long millisUntilFinished) {
@@ -568,15 +570,16 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         // if button is clicked, close the custom dialogOtp
         SmsReceiver.bindListener(messageText -> {
             //Log.d("activity",""+messageText);
-            otp_view.setText(messageText.split(" ")[0].trim());
+            //otp_view.setText(messageText.split(" ")[0].trim());
+            otp_view.setOTP(messageText.split(" ")[0].trim());
         });
         button_submit.setOnClickListener(v -> {
-            if (otp_view.getText().length() < 6) {
+            if (otp_view.getOTP().length() < 4) {
                 Toast.makeText(LoginActivity.this, "Enter Valid OTP !", Toast.LENGTH_SHORT).show();
             } else {
                 button_submit.setClickable(false);
                 dialogOtp.dismiss();
-                new SmsVerificationService(LoginActivity.this, imei, imei).execute(otp_view.getText().toString().trim());
+                new SmsVerificationService(LoginActivity.this, imei, imei).execute(otp_view.getOTP().toString().trim());
             }
 
         });

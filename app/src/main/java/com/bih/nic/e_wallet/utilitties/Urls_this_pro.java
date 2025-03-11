@@ -6,6 +6,8 @@ public interface Urls_this_pro{
 
     //live
     public static final String BASEURL="http://energypayment.bsphcl.co.in/ewallet/api/nic/";
+    //staging
+    //public static final String BASEURL="http://1.6.61.111/ewallet/api/nic/";
     public static final String EWALLET_OUIRY_VERSION = BASEURL+"appVer?reqStr=";
     public static final String LOG_IN_URL = BASEURL+"vendorLogin?reqStr=";
     public static final String AllOCATED_MRU_URL = BASEURL+"allotedMRU?reqStr=";
