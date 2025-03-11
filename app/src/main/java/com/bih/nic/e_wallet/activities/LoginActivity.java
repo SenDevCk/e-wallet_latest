@@ -478,7 +478,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         return app;
     }
 
-
+    //permission handling
     @RequiresApi(api = Build.VERSION_CODES.S)
     private boolean checkAndRequestPermissions() {
         int read_media;
