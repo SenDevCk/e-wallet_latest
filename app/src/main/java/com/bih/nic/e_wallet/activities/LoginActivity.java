@@ -231,12 +231,12 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 //                        dialog1.setCancelable(false);
 //                        dialog1.setMessage("Waiting for SMS...");
 //                        dialog1.show();
-                        countDownTimer = new CountDownTimer(30000, 1000) {
+                        countDownTimer = new CountDownTimer(10000, 1000) {
 
                             public void onTick(long millisUntilFinished) {
                                 long seconds=millisUntilFinished / 1000;
                                 dialog1.setCanceledOnTouchOutside(false);
-                                dialog1.setMessage("Waiting For Otp for 30 seconds... remaining "+seconds+" seconds" );
+                                dialog1.setMessage("Waiting For Otp for 10 seconds... remaining "+seconds+" seconds" );
                                 dialog1.show();
                                 //here you can have your logic to set text to edittext
                             }
@@ -552,7 +552,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         final Button go_to_home = (Button) dialogOtp.findViewById(R.id.go_to_home);
         go_to_home.setVisibility(View.GONE);
         final TextView text_timer = (TextView) dialogOtp.findViewById(R.id.text_timer);
-        countDownTimer = new CountDownTimer(60000, 1000) {
+        countDownTimer = new CountDownTimer(50000, 1000) {
             public void onTick(long millisUntilFinished) {
                 long secs= millisUntilFinished / 1000;
                 text_timer.setVisibility(View.VISIBLE);
@@ -579,10 +579,11 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             } else {
                 button_submit.setClickable(false);
                 dialogOtp.dismiss();
-                new SmsVerificationService(LoginActivity.this, imei, imei).execute(otp_view.getOTP().toString().trim());
+                new SmsVerificationService(LoginActivity.this, imei, imei).execute(edit_user_name.getText().toString().trim() + "|" + imei.trim() + "|" +otp_view.getOTP().toString().trim());
             }
 
         });
+        dialogOtp.setCancelable(false);
         dialogOtp.show();
     }
 }
