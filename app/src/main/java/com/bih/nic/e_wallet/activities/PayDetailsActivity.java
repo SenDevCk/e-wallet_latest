@@ -45,7 +45,13 @@ import com.bih.nic.e_wallet.webservices.WebServiceHelper;
 
 import org.json.JSONObject;
 
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -409,7 +415,29 @@ public class PayDetailsActivity extends AppCompatActivity implements View.OnClic
         mruEntity2.setBILL_ADDR1(smartConsumerDetail.getAddress());
         mruEntity2.setFA_HU_NAME(smartConsumerDetail.getFatherName());
         mruEntity2.setLAST_PAY_DATE(smartConsumerDetail.getPrevPaidDt());
-        mruEntity2.setPAYBLE_AMOUNT(smartConsumerDetail.getGrossAmt());
+        Date date=null,newDate=null,currentDate=null;
+        try {
+            SimpleDateFormat formatter =  new SimpleDateFormat("dd-MMM-yy", Locale.ENGLISH);
+            date = formatter.parse(smartConsumerDetail.getDueDate());
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(date);
+            calendar.add(Calendar.DAY_OF_MONTH, -10);  // Subtract 10 days
+            newDate = calendar.getTime();
+            currentDate=calendar.getTime();
+            if (currentDate.equals(newDate) || currentDate.before(newDate)){
+                mruEntity2.setPAYBLE_AMOUNT(smartConsumerDetail.getPromptAmt());
+            }else if(currentDate.equals(date) || currentDate.before(date)){
+                mruEntity2.setPAYBLE_AMOUNT(smartConsumerDetail.getGrossAmt());
+            } else if (currentDate.after(date)) {
+                mruEntity2.setPAYBLE_AMOUNT(smartConsumerDetail.getNetAmt());
+            } else{
+                mruEntity2.setPAYBLE_AMOUNT(smartConsumerDetail.getNetAmt());
+            }
+        }catch(Exception e){
+            e.printStackTrace();
+            mruEntity2.setPAYBLE_AMOUNT(smartConsumerDetail.getNetAmt());
+        }
+        //mruEntity2.setPAYBLE_AMOUNT(smartConsumerDetail.getGrossAmt());
         mruEntity2.setMOBILE_NO(smartConsumerDetail.getMobNo());
         mruEntity2.setMETER_NO(smartConsumerDetail.getMeterNo());
         mruEntity2.setTARIFF_ID(smartConsumerDetail.getCategory());
@@ -499,11 +527,11 @@ public class PayDetailsActivity extends AppCompatActivity implements View.OnClic
             check_con_pay.setText(" You can't pay Rs. " + edit_payable_amount.getText().toString());
             check_con_pay.startAnimation(fade_in);
         }
-        else if (userInfo2.getUserID().startsWith("2") && Double.parseDouble(edit_payable_amount.getText().toString()) > paying_amt) {
+       /* else if (userInfo2.getUserID().startsWith("2") && Double.parseDouble(edit_payable_amount.getText().toString()) > paying_amt) {
             check_con_pay.setVisibility(View.VISIBLE);
             check_con_pay.setText(" You can't pay more than Rs. " + paying_amt);
             check_con_pay.startAnimation(fade_in);
-        }
+        }*/
         else {
             navigationIntent(mruEntity1);
         }

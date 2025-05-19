@@ -140,7 +140,6 @@ public class PinCodeActivity extends AppCompatActivity implements View.OnClickLi
     public void AlertDialogForPayment() {
         final Dialog dialog = new Dialog(PinCodeActivity.this);
         /*	dialog.requestWindowFeature(Window.FEATURE_NO_TITLE); //before*/
-
         dialog.setContentView(R.layout.dialog_verify);
         dialog.setTitle("Verify");
         TextView text_amount =  (TextView)dialog.findViewById(R.id.text_amount);
@@ -170,8 +169,6 @@ public class PinCodeActivity extends AppCompatActivity implements View.OnClickLi
                 new MakePaymentLoader().execute(userInfo2.getUserID() + "|" + userInfo2.getPassword() + "|" + userInfo2.getImeiNo() + "|"
                + userInfo2.getSerialNo() + "|" + mruEntity.getBOOK_NO().trim() + "|" + mruEntity.getCON_ID().trim() + "|" + amount.trim() + "|" + otp_view.getOTP().toString().trim() + "|" + mobile.trim() + "|" + mruEntity.getBILL_NO().trim() + "|M|" + version + "|" + Utiilties.getCurrentDate());
             }
-
-
         });
 
         dialog.show();

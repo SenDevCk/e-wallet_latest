@@ -44,9 +44,13 @@ import com.bih.nic.e_wallet.utilitties.Utiilties;
 import com.bih.nic.e_wallet.utilitties.WebHandler;
 import com.bih.nic.e_wallet.webservices.WebServiceHelper;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -368,7 +372,28 @@ public class ConsumerListActivity extends AppCompatActivity {
         mruEntity2.setBILL_ADDR1(smartConsumerDetail.getAddress());
         mruEntity2.setFA_HU_NAME(smartConsumerDetail.getFatherName());
         mruEntity2.setLAST_PAY_DATE(smartConsumerDetail.getPrevPaidDt());
-        mruEntity2.setPAYBLE_AMOUNT(smartConsumerDetail.getGrossAmt());
+        Date date=null,newDate=null,currentDate=null;
+        try {
+            SimpleDateFormat formatter =  new SimpleDateFormat("dd-MMM-yy", Locale.ENGLISH);
+            date = formatter.parse(smartConsumerDetail.getDueDate());
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(date);
+            calendar.add(Calendar.DAY_OF_MONTH, -10);  // Subtract 10 days
+            newDate = calendar.getTime();
+            currentDate=calendar.getTime();
+            if (currentDate.equals(newDate) || currentDate.before(newDate)){
+                mruEntity2.setPAYBLE_AMOUNT(smartConsumerDetail.getPromptAmt());
+            }else if(currentDate.equals(date) || currentDate.before(date)){
+                mruEntity2.setPAYBLE_AMOUNT(smartConsumerDetail.getGrossAmt());
+            } else if (currentDate.after(date)) {
+                mruEntity2.setPAYBLE_AMOUNT(smartConsumerDetail.getNetAmt());
+            } else{
+                mruEntity2.setPAYBLE_AMOUNT(smartConsumerDetail.getNetAmt());
+            }
+        }catch(Exception e){
+            e.printStackTrace();
+            mruEntity2.setPAYBLE_AMOUNT(smartConsumerDetail.getNetAmt());
+        }
         mruEntity2.setMOBILE_NO(smartConsumerDetail.getMobNo());
         mruEntity2.setMETER_NO(smartConsumerDetail.getMeterNo());
         mruEntity2.setTARIFF_ID(smartConsumerDetail.getCategory());

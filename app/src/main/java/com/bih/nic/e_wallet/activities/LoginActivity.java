@@ -195,6 +195,9 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                counter++;
                loginUsingRetrofit(reqString(edit_user_name.getText().toString() + "|" + edit_pass.getText().toString() + "|" + imei + "|" + serial_id));
            }
+
+            //Intent cPannel = new Intent(LoginActivity.this, MainActivity.class);
+            //startActivity(cPannel);
         }
 
     }
